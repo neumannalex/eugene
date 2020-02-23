@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eugene.Core", "Eugene.Core\Eugene.Core.csproj", "{0DD016AF-E929-412A-81EC-F1D997874355}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eugene", "Eugene.Console\Eugene.csproj", "{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0DD016AF-E929-412A-81EC-F1D997874355}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DD016AF-E929-412A-81EC-F1D997874355}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DD016AF-E929-412A-81EC-F1D997874355}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DD016AF-E929-412A-81EC-F1D997874355}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F8F234AB-65B4-4FD3-9B1D-9E9ED4F9698D}
+	EndGlobalSection
+EndGlobal
