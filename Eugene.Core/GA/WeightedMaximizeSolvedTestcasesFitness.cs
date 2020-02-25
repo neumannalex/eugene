@@ -77,7 +77,7 @@ namespace Eugene.Core.GA
 
             double fitness = value / cost;
 
-            OnEvaluated(new ChromosomeEvaluatedEventArgs(fitness, value, cost, blockersToResolve, resolvedTestcases, genes));
+            //OnEvaluated(new ChromosomeEvaluatedEventArgs(fitness, value, cost, blockersToResolve, resolvedTestcases, genes));
 
             return fitness;
         }

@@ -109,27 +109,5 @@ namespace Eugene.Core.Models
                 }
             });
         }
-
-        public async Task SaveAsync(string filename)
-        {
-            var jsonOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-
-            using (FileStream fs = File.Create(filename))
-            {
-                await JsonSerializer.SerializeAsync(fs, this, jsonOptions);
-            }
-        }
-
-        public static async Task<TestcaseBlockerDataset> LoadAsync(string filename)
-        {
-            using (FileStream fs = File.OpenRead(filename))
-            {
-                var configuration = await JsonSerializer.DeserializeAsync<TestcaseBlockerDataset>(fs);
-                return configuration;
-            }
-        }
     }
 }

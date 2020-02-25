@@ -62,18 +62,5 @@ namespace Eugene.Core
             ResolvedTestcases = solvedTestcases;
             ResolvedTestcasesIncludingUnblocked = solvedTestcasesIncludingUnblocked;
         }
-
-        public async Task SaveAsync(string filename)
-        {
-            var jsonOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-
-            using (FileStream fs = File.Create(filename))
-            {
-                await JsonSerializer.SerializeAsync(fs, this, jsonOptions);
-            }
-        }
     }
 }

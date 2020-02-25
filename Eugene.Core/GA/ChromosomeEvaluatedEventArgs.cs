@@ -12,6 +12,7 @@ namespace Eugene.Core.GA
         public double Cost { get; private set; }
         public List<Blocker> Blockers { get; private set; } = new List<Blocker>();
         public List<Testcase> Testcases { get; private set; } = new List<Testcase>();
+
         public List<bool> Genes { get; private set; } = new List<bool>();
 
         public ChromosomeEvaluatedEventArgs(double fitness, double value, double cost, List<Blocker> blockers, List<Testcase> testcases, List<bool> genes)

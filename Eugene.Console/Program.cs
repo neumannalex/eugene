@@ -1,5 +1,6 @@
 ﻿using Eugene.Core;
 using Eugene.Core.GA;
+using Eugene.Core.Helper;
 using Eugene.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -149,7 +150,17 @@ namespace Eugene
 
             Console.WriteLine("Importing dataset...");
 
-            var dataset = DataGenerator.Import(filename);
+            var options = new ExcelImportOptions
+            {
+                WorksheetName = "Rohdaten_19.02.2020",
+                FirstDataRow = 2,
+                ColumnNumberTestcaseId = 2,
+                ColumnNumberTestcaseName = 4,
+                ColumnNumberBlockerNames = 1,
+                BlockerSeparator = ","
+            };
+
+            var dataset = DataGenerator.ImportFromExcel(filename, options);
             Console.WriteLine(dataset.ToString());
 
             return dataset;
@@ -181,7 +192,7 @@ namespace Eugene
 
             Console.WriteLine("Loading dataset...");
 
-            var dataset = await TestcaseBlockerDataset.LoadAsync(path);
+            var dataset = await IOOperations.LoadAsync<TestcaseBlockerDataset>(path);
             Console.WriteLine(dataset.ToString());
 
             return dataset;
@@ -202,7 +213,7 @@ namespace Eugene
 
             Console.WriteLine($"Saving dataset to {path}");
 
-            await dataset.SaveAsync(path);
+            await IOOperations.SaveAsync<TestcaseBlockerDataset>(path, dataset);
         }
 
         public static async Task ExportDataset(TestcaseBlockerDataset dataset)
@@ -288,7 +299,7 @@ namespace Eugene
 
                 Console.WriteLine($"Saving result to {path}");
 
-                await result.SaveAsync(path);
+                await IOOperations.SaveAsync<OptimizationResult>(path, result);
             }
 
         }

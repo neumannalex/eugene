@@ -62,8 +62,9 @@ namespace Eugene.Core
             _crossover = new UniformCrossover();
             _mutation = new TworsMutation();
 
-            _fitness = new WeightedMaximizeSolvedTestcasesFitness(_dataset);
             _chromosome = new BlockedTestcasesChromosome(_dataset.Blockers.Count);
+            _fitness = new WeightedMaximizeSolvedTestcasesFitness(_dataset);
+
             _population = new Population(20, 40, _chromosome);
 
             _ga = new GeneticAlgorithm(_population, _fitness, _selection, _crossover, _mutation);

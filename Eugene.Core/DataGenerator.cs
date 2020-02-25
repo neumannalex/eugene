@@ -56,78 +56,93 @@ namespace Eugene.Core
             return configuration;
         }
 
-        public static TestcaseBlockerDataset Import(string filename)
+        public static TestcaseBlockerDataset ImportFromExcel(string filename, ExcelImportOptions options)
         {
-            var worksheetName = "Rohdaten_19.02.2020";
+            if (string.IsNullOrEmpty(options.WorksheetName))
+                throw new ArgumentException("WorksheetName is empty");
 
-            var columnNumberTestcaseId = 2;
-            var columnNumberTestcaseName = 4;
+            if (string.IsNullOrEmpty(options.BlockerSeparator))
+                throw new ArgumentException("BlockerSeparator is empty");
 
-            var columnNumberBlockerNames = 1;
-            var blockerSeparator = ',';
+            if (options.ColumnNumberTestcaseId <= 0)
+                throw new ArgumentException("ColumnNumberTestcaseId must be greater than zero.");
 
-            var firstDataRow = 2;
-            var lastDataRow = firstDataRow;
+            if (options.ColumnNumberTestcaseName <= 0)
+                throw new ArgumentException("ColumnNumberTestcaseName must be greater than zero.");
 
-            var blockers = new List<Blocker>();
-            var testcases = new List<Testcase>();
+            if (options.ColumnNumberBlockerNames <= 0)
+                throw new ArgumentException("ColumnNumberBlockerNames must be greater than zero.");
 
-            FileInfo existingFile = new FileInfo(filename);
-            using (var excel = new ExcelPackage(existingFile))
+            if (options.FirstDataRow <= 0)
+                throw new ArgumentException("FirstDataRow must be greater than zero.");
+
+            try
             {
-                var ws = excel.Workbook.Worksheets[worksheetName];
-                lastDataRow = ws.Dimension.End.Row;
+                var blockers = new List<Blocker>();
+                var testcases = new List<Testcase>();
 
-                for(int row = firstDataRow; row <= lastDataRow; row++)
+                FileInfo existingFile = new FileInfo(filename);
+                using (var excel = new ExcelPackage(existingFile))
                 {
-                    var testcaseId = (Convert.ToString(ws.Cells[row, columnNumberTestcaseId].Value)).Trim();
-                    var testcaseName = (Convert.ToString(ws.Cells[row, columnNumberTestcaseName].Value)).Trim();
+                    var ws = excel.Workbook.Worksheets[options.WorksheetName];
+                    if (!options.LastDataRow.HasValue)
+                        options.LastDataRow = ws.Dimension.End.Row;
 
-                    var blockerNamesString = (Convert.ToString(ws.Cells[row, columnNumberBlockerNames].Value)).Trim();
-                    var blockerNames = new List<string>(blockerNamesString.Split(blockerSeparator));
-
-                    var testcase = new Testcase
+                    for (int row = options.FirstDataRow; row <= options.LastDataRow.Value; row++)
                     {
-                        Id = testcaseId,
-                        Name = testcaseName
-                    };
+                        var testcaseId = (Convert.ToString(ws.Cells[row, options.ColumnNumberTestcaseId].Value)).Trim();
+                        var testcaseName = (Convert.ToString(ws.Cells[row, options.ColumnNumberTestcaseName].Value)).Trim();
 
-                    foreach(var blockerName in blockerNames)
-                    {
-                        var trimmedBlockerName = blockerName.Trim().ToLower();
+                        var blockerNamesString = (Convert.ToString(ws.Cells[row, options.ColumnNumberBlockerNames].Value)).Trim();
+                        var blockerNames = new List<string>(blockerNamesString.Split(options.BlockerSeparator.ToCharArray()));
 
-                        if (!string.IsNullOrEmpty(trimmedBlockerName))
+                        var testcase = new Testcase
                         {
-                            var existingBlocker = blockers.Where(x => x.Name == trimmedBlockerName).FirstOrDefault();
+                            Id = testcaseId,
+                            Name = testcaseName
+                        };
 
-                            if (existingBlocker == null)
+                        foreach (var blockerName in blockerNames)
+                        {
+                            var trimmedBlockerName = blockerName.Trim().ToLower();
+
+                            if (!string.IsNullOrEmpty(trimmedBlockerName))
                             {
-                                existingBlocker = new Blocker
+                                var existingBlocker = blockers.Where(x => x.Name == trimmedBlockerName).FirstOrDefault();
+
+                                if (existingBlocker == null)
                                 {
-                                    Id = Guid.NewGuid().ToString().Replace("-", ""),
-                                    Name = trimmedBlockerName,
-                                    Cost = 1
-                                };
+                                    existingBlocker = new Blocker
+                                    {
+                                        Id = Guid.NewGuid().ToString().Replace("-", ""),
+                                        Name = trimmedBlockerName,
+                                        Cost = 1
+                                    };
 
-                                blockers.Add(existingBlocker);
+                                    blockers.Add(existingBlocker);
+                                }
+
+                                if (!testcase.BlockerIds.Contains(existingBlocker.Id))
+                                    testcase.BlockerIds.Add(existingBlocker.Id);
                             }
-
-                            if (!testcase.BlockerIds.Contains(existingBlocker.Id))
-                                testcase.BlockerIds.Add(existingBlocker.Id);
                         }
+
+                        testcases.Add(testcase);
                     }
-
-                    testcases.Add(testcase);
                 }
+
+                var dataset = new TestcaseBlockerDataset
+                {
+                    Blockers = blockers,
+                    Testcases = testcases
+                };
+
+                return dataset;
             }
-
-            var dataset = new TestcaseBlockerDataset
+            catch(Exception)
             {
-                Blockers = blockers,
-                Testcases = testcases
-            };
-
-            return dataset;
+                throw; 
+            }
         }
     }
 }
