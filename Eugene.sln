@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eugene.Core", "Eugene.Core\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eugene", "Eugene.Console\Eugene.csproj", "{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eugene.Desktop", "Eugene.Desktop\Eugene.Desktop.csproj", "{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
