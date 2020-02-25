@@ -20,8 +20,14 @@ namespace Eugene.Core.GA
 
         public override Gene GenerateGene(int geneIndex)
         {
+            //var maxNumberOfUsedBlockers = 3;
+            //var threshold = (double)maxNumberOfUsedBlockers / (double)this.Length;
+            //var threshold = Math.Sqrt((double)maxNumberOfUsedBlockers / (double)this.Length);
+
+            var threshold = 0.5;
+
             var p = RandomizationProvider.Current.GetDouble(0, 1);
-            return new Gene(p >= 0.5 ? true : false);
+            return new Gene(p < threshold ? true : false);
         }
     }
 }

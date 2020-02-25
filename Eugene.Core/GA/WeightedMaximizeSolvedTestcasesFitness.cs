@@ -33,7 +33,7 @@ namespace Eugene.Core.GA
         {
             get
             {
-                return _dataset.Testcases.Sum(x => x.Weight);
+                return _dataset.Testcases.Where(x => x.BlockerIds.Count > 0).Sum(x => x.Weight);
             }
         }
 
@@ -54,6 +54,8 @@ namespace Eugene.Core.GA
 
         public double Evaluate(IChromosome chromosome)
         {
+            var maxToleratedCost = 3.0;
+
             var myChromosome = chromosome as BlockedTestcasesChromosome;
             var genes = myChromosome.GetGenes().Select(x => (bool)x.Value).ToList();
 
@@ -64,7 +66,14 @@ namespace Eugene.Core.GA
                 return 0;
 
             var cost = GetCostForResolvedBlockers(blockersToResolve);
+            if (cost > maxToleratedCost)
+            {
+                var exceed = cost - maxToleratedCost;
+                cost = maxToleratedCost = Math.Pow(2, exceed);
+            }
+
             var value = GetValueForResolvedTestcases(resolvedTestcases);
+            value /= MaximumValue;
 
             double fitness = value / cost;
 
@@ -135,7 +144,8 @@ namespace Eugene.Core.GA
 
         private double GetBlockerCost(Blocker blocker, int rank = 0)
         {
-            return Math.Pow(2, rank) * blocker.Cost;
+            //return Math.Pow(2, rank) * blocker.Cost;
+            return blocker.Cost;
         }
     }
 }

@@ -43,32 +43,36 @@ namespace Eugene.Core.Models
                     // Blocker
                     for (int i = 0; i < Blockers.Count; i++)
                     {
-                        ws.Cells[1, i + 2].Value = Blockers[i].Name;
-                        ws.Cells[1, i + 2].Style.TextRotation = 90;
-                        ws.Cells[1, i + 2].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Top;
-                        ws.Cells[1, i + 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                        ws.Cells[1, i + 3].Value = Blockers[i].Name;
+                        ws.Cells[1, i + 3].Style.TextRotation = 90;
+                        ws.Cells[1, i + 3].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Top;
+                        ws.Cells[1, i + 3].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
-                        ws.Cells[Testcases.Count + 2, i + 2].FormulaR1C1 = $"=SUBTOTAL(3,R[-{Testcases.Count}]C:R[-1]C)";
-                        ws.Cells[Testcases.Count + 2, i + 2].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-                        ws.Cells[Testcases.Count + 2, i + 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                        ws.Cells[Testcases.Count + 2, i + 3].FormulaR1C1 = $"=SUBTOTAL(3,R[-{Testcases.Count}]C:R[-1]C)";
+                        ws.Cells[Testcases.Count + 2, i + 3].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                        ws.Cells[Testcases.Count + 2, i + 3].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                     }
 
                     // Anzahl Blocker
-                    ws.Cells[1, Blockers.Count + 2].Value = "Anzahl Blocker";
-                    ws.Cells[1, Blockers.Count + 2].Style.TextRotation = 90;
-                    ws.Cells[1, Blockers.Count + 2].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Top;
-                    ws.Cells[1, Blockers.Count + 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    ws.Cells[1, Blockers.Count + 3].Value = "Anzahl Blocker";
+                    ws.Cells[1, Blockers.Count + 3].Style.TextRotation = 90;
+                    ws.Cells[1, Blockers.Count + 3].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Top;
+                    ws.Cells[1, Blockers.Count + 3].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
                     // Testfälle
                     for (int i = 0; i < Testcases.Count; i++)
                     {
-                        ws.Cells[i + 2, 1].Value = Testcases[i].Name;
+                        ws.Cells[i + 2, 1].Value = Testcases[i].Id;
                         ws.Cells[i + 2, 1].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
                         ws.Cells[i + 2, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
 
-                        ws.Cells[i + 2, Blockers.Count + 2].FormulaR1C1 = $"=COUNTIF(RC[-{Blockers.Count}]:RC[-1],\"=x\")";
-                        ws.Cells[i + 2, Blockers.Count + 2].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-                        ws.Cells[i + 2, Blockers.Count + 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                        ws.Cells[i + 2, 2].Value = Testcases[i].Name;
+                        ws.Cells[i + 2, 2].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                        ws.Cells[i + 2, 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+
+                        ws.Cells[i + 2, Blockers.Count + 3].FormulaR1C1 = $"=COUNTIF(RC[-{Blockers.Count}]:RC[-1],\"=x\")";
+                        ws.Cells[i + 2, Blockers.Count + 3].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                        ws.Cells[i + 2, Blockers.Count + 3].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                     }
 
                     // Anzahl geblockte Testfälle
@@ -86,19 +90,19 @@ namespace Eugene.Core.Models
 
                             if (blocked)
                             {
-                                ws.Cells[row + 2, col + 2].Value = "x";
+                                ws.Cells[row + 2, col + 3].Value = "x";
                             }
 
-                            ws.Cells[row + 2, col + 2].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-                            ws.Cells[row + 2, col + 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                            ws.Cells[row + 2, col + 3].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                            ws.Cells[row + 2, col + 3].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                         }
                     }
 
                     // Globale Formate
-                    for(int col = 2; col <= Blockers.Count + 2; col++) // funktioniert nicht
+                    for(int col = 3; col <= Blockers.Count + 3; col++) // funktioniert nicht
                         ws.Column(col).AutoFit();
 
-                    ws.Cells[1, 2, 1, Blockers.Count + 2].AutoFilter = true;
+                    ws.Cells[1, 3, 1, Blockers.Count + 3].AutoFilter = true;
 
                     // Speichern
                     xls.SaveAs(new FileInfo(filename));

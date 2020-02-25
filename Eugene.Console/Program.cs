@@ -29,6 +29,10 @@ namespace Eugene
                     case "q":
                         runApp = false;
                         break;
+                    case "0":
+                        dataset = ImportDataset();
+                        Console.ReadKey();
+                        break;
                     case "1":
                         dataset = await GenerateDataset();
                         Console.ReadKey();
@@ -50,7 +54,7 @@ namespace Eugene
                         Console.ReadKey();
                         break;
                     case "6":
-                        RunOptimization(dataset);
+                        await RunOptimization(dataset);
                         Console.ReadKey();
                         break;
                     default:
@@ -63,6 +67,7 @@ namespace Eugene
         {
             Console.Clear();
             Console.WriteLine("Hello, I am Eugene. These are your options:\n");
+            Console.WriteLine("0: Import dataset");
             Console.WriteLine("1: Generate random dataset");
             Console.WriteLine("2: Show available datasets");
             Console.WriteLine("3: Load dataset");
@@ -129,6 +134,25 @@ namespace Eugene
                 Console.WriteLine(dataset.ToString());
                 return dataset;
             });
+        }
+
+        public static TestcaseBlockerDataset ImportDataset()
+        {
+            Console.Write("Enter filename with path: ");
+            string filename = Console.ReadLine();
+
+            if (!File.Exists(filename))
+            {
+                Console.WriteLine($"File not found at {filename}");
+                return null;
+            }
+
+            Console.WriteLine("Importing dataset...");
+
+            var dataset = DataGenerator.Import(filename);
+            Console.WriteLine(dataset.ToString());
+
+            return dataset;
         }
 
         public static void ShowAvailableDatasets()
@@ -199,7 +223,7 @@ namespace Eugene
             await dataset.ExportAsXlsxAsync(path);
         }
 
-        public static void RunOptimization(TestcaseBlockerDataset dataset)
+        public static async Task RunOptimization(TestcaseBlockerDataset dataset)
         {
             if (dataset is null)
             {
@@ -233,11 +257,40 @@ namespace Eugene
             var duration = TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds);
             watch.Stop();
 
+            var resolvedBlockers = string.Join(",", result.ResolvedBlockers.Select(x => x.Name).ToList());
+            if (resolvedBlockers.Length > 100)
+                resolvedBlockers = resolvedBlockers.Substring(0, 97) + "...";
+
+            var resolvedTestcases = string.Join(",", result.ResolvedTestcases.Select(x => x.Id).ToList());
+            if (resolvedTestcases.Length > 100)
+                resolvedTestcases = resolvedTestcases.Substring(0, 97) + "...";
+
+            var resolvedTestcasesIncludingUnblocked = string.Join(",", result.ResolvedTestcasesIncludingUnblocked.Select(x => x.Id).ToList());
+            if (resolvedTestcasesIncludingUnblocked.Length > 100)
+                resolvedTestcasesIncludingUnblocked = resolvedTestcasesIncludingUnblocked.Substring(0, 97) + "...";
+
             Console.WriteLine();
-            Console.WriteLine($"Duration: {duration.ToString()} (including output)");
-            Console.WriteLine($"Best solution fitness: {result.Fitness}");
-            Console.WriteLine($"Resolved Blockers: ({result.NumberOfSolvedBlockers}/{result.Cost}) [{string.Join(",", result.Blockers.Select(x => "'" + x.Name + "'").ToList())}]");
-            Console.WriteLine($"Resolved Testcases: ({result.NumberOfSolvedTestcases}/{result.Value}) [{string.Join(",", result.Testcases.Select(x => "'" + x.Name + "'").ToList())}]");
+            Console.WriteLine($"Duration                      : {duration.ToString()} (including output)");
+            Console.WriteLine($"Best solution fitness         : {result.Fitness}");
+            Console.WriteLine($"Resolved Blockers             : ({result.NumberOfResolvedBlockers}/{result.Cost}) [{resolvedBlockers}]");
+            Console.WriteLine($"Resolved Testcases            : ({result.NumberOfResolvedTestcases}/{result.Value}) [{resolvedTestcases}]");
+            Console.WriteLine($"Resolved Testcases w/unblocked: ({result.NumberOfResolvedTestcasesIncludingUnblocked}/{result.ValueIncludingUnblocked}) [{resolvedTestcasesIncludingUnblocked}]");
+            Console.WriteLine();
+            Console.Write("Save result (y|n)? ");
+
+            var saveResult = Console.ReadLine().Trim().ToLower();
+            if(saveResult == "y")
+            {
+                Console.Write("Enter filename without extension: ");
+                string filename = Console.ReadLine();
+
+                var path = Path.Combine(GetDataPath(), filename + ".json");
+
+                Console.WriteLine($"Saving result to {path}");
+
+                await result.SaveAsync(path);
+            }
+
         }
 
         public static string GetDataPath()

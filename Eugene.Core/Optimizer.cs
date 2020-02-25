@@ -64,7 +64,7 @@ namespace Eugene.Core
 
             _fitness = new WeightedMaximizeSolvedTestcasesFitness(_dataset);
             _chromosome = new BlockedTestcasesChromosome(_dataset.Blockers.Count);
-            _population = new Population(20, 30, _chromosome);
+            _population = new Population(20, 40, _chromosome);
 
             _ga = new GeneticAlgorithm(_population, _fitness, _selection, _crossover, _mutation);
             _ga.Termination = new OrTermination( new FitnessStagnationTermination(100),
@@ -78,11 +78,13 @@ namespace Eugene.Core
 
             var resolvedBlockers = GetBlockersToResolve(_ga.BestChromosome);
             var resolvedTestcases = GetResolvedTestcases(resolvedBlockers);
+            var resolvedTestcasesIncludingUnblocked = GetResolvedTestcasesIncludingUnblocked(resolvedBlockers);
 
             var cost = _fitness.GetCostForResolvedBlockers(resolvedBlockers);
             var value = _fitness.GetValueForResolvedTestcases(resolvedTestcases);
+            var valueIncludingUnblocked = _fitness.GetValueForResolvedTestcases(resolvedTestcasesIncludingUnblocked);
 
-            var optimizationResult = new OptimizationResult(_ga.BestChromosome.Fitness.Value, value, cost, resolvedBlockers, resolvedTestcases);
+            var optimizationResult = new OptimizationResult(_ga.BestChromosome.Fitness.Value, value, valueIncludingUnblocked, cost, resolvedBlockers, resolvedTestcases, resolvedTestcasesIncludingUnblocked);
             return optimizationResult;
         }
 
@@ -103,7 +105,7 @@ namespace Eugene.Core
 
         private List<Testcase> GetResolvedTestcases(List<Blocker> blockers)
         {
-            var allTestcases = DeepClone.GetDeepClone<List<Testcase>>(_dataset.Testcases.ToList());
+            var allTestcases = DeepClone.GetDeepClone<List<Testcase>>(_dataset.Testcases.Where(x => x.BlockerIds.Count > 0).ToList());
             var resolvedTestcases = new List<Testcase>();
 
             foreach(var testcase in allTestcases)
@@ -117,6 +119,30 @@ namespace Eugene.Core
                 }
 
                 if(testcase.BlockerIds.Count <= 0)
+                {
+                    resolvedTestcases.Add(testcase);
+                }
+            }
+
+            return resolvedTestcases;
+        }
+
+        private List<Testcase> GetResolvedTestcasesIncludingUnblocked(List<Blocker> blockers)
+        {
+            var allTestcases = DeepClone.GetDeepClone<List<Testcase>>(_dataset.Testcases.ToList());
+            var resolvedTestcases = new List<Testcase>();
+
+            foreach (var testcase in allTestcases)
+            {
+                foreach (var blocker in blockers)
+                {
+                    if (testcase.BlockerIds.Contains(blocker.Id))
+                    {
+                        testcase.BlockerIds.Remove(blocker.Id);
+                    }
+                }
+
+                if (testcase.BlockerIds.Count <= 0)
                 {
                     resolvedTestcases.Add(testcase);
                 }
