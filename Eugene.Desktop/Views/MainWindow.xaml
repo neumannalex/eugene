@@ -4,22 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:prism="http://prismlibrary.com/"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:Eugene.Desktop"
         xmlns:commands="clr-namespace:Eugene.Desktop.Commands"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <!--<Window.CommandBindings>
-        <CommandBinding Command="commands:EugeneCommands.Exit" Executed="ExitCommand_Executed" />
-        <CommandBinding Command="commands:EugeneCommands.LoadDataset" Executed="LoadDatasetCommand_Executed" CanExecute="LoadDatasetCommand_CanExecuted" />
-        <CommandBinding Command="commands:EugeneCommands.SaveDataset" Executed="SaveDatasetCommand_Executed" CanExecute="SaveDatasetCommand_CanExecuted" />
-        <CommandBinding Command="commands:EugeneCommands.ImportDataset" Executed="ImportDatasetCommand_Executed" CanExecute="ImportDatasetCommand_CanExecuted" />
-        <CommandBinding Command="commands:EugeneCommands.ExportDataset" Executed="ExportDatasetCommand_Executed" CanExecute="ExportDatasetCommand_CanExecuted" />
-        <CommandBinding Command="commands:EugeneCommands.GenerateDataset" Executed="GenerateDatasetCommand_Executed" CanExecute="GenerateDatasetCommand_CanExecuted" />
-        <CommandBinding Command="commands:EugeneCommands.StartOptimization" Executed="StartOptimizationCommand_Executed" CanExecute="StartOptimizationCommand_CanExecuted" />
-        <CommandBinding Command="commands:EugeneCommands.SaveResult" Executed="SaveResultCommand_Executed" CanExecute="SaveResultCommand_CanExecuted" />
-        <CommandBinding Command="commands:EugeneCommands.ExportResult" Executed="ExportResultCommand_Executed" CanExecute="ExportResultCommand_CanExecuted" />
-    </Window.CommandBindings>-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -28,26 +18,51 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <MenuItem Header="Exit" />
+                <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" />
             </MenuItem>
             <MenuItem Header="Dataset">
                 <MenuItem Header="Load" Command="{Binding LoadDatasetCommand}" />
-                <!--<MenuItem Header="Save" Command="commands:EugeneCommands.SaveDataset" />
-                <MenuItem Header="Import" Command="commands:EugeneCommands.ImportDataset" />
-                <MenuItem Header="Export" Command="commands:EugeneCommands.ExportDataset" />
+                <MenuItem Header="Save" Command="{Binding SaveDatasetCommand}" />
+                <MenuItem Header="Import" Command="{Binding ImportDatasetCommand}" />
+                <MenuItem Header="Export" Command="{Binding ExportDatasetCommand}" />
                 <Separator />
-                <MenuItem Header="Generate Random" Command="commands:EugeneCommands.GenerateDataset" />-->
+                <MenuItem Header="Generate Random" Command="{Binding GenerateDatasetCommand}" />
             </MenuItem>
             <MenuItem Header="Optimization">
-                <!--<MenuItem Header="Start" Command="commands:EugeneCommands.StartOptimization" />-->
                 <MenuItem Header="Start" Command="{Binding StartOptimizationCommand}" />
             </MenuItem>
             <MenuItem Header="Result">
-                <!--<MenuItem Header="Save" Command="commands:EugeneCommands.SaveResult" />
-                <MenuItem Header="Export" Command="commands:EugeneCommands.ExportResult" />-->
+                <MenuItem Header="Save" Command="{Binding SaveResultCommand}" />
+                <MenuItem Header="Export" Command="{Binding ExportResultCommand}" />
             </MenuItem>
         </Menu>
 
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Vertical">
+                <GroupBox Header="Blockers" MinHeight="200">
+                    <xctk:CheckListBox ItemsSource="{Binding Dataset.Blockers}" DisplayMemberPath="Name" SelectedItemsOverride="{Binding SelectedBlockers}" />
+                </GroupBox>
+                <GroupBox Header="Resolution" MinHeight="200">
+                    <xctk:PropertyGrid SelectedObject="{Binding Result}" />
+                </GroupBox>
+            </StackPanel>
+
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns" HorizontalAlignment="Stretch" />
+
+            <DataGrid Grid.Column="2" ItemsSource="{Binding DatasetAsTable.DefaultView}"
+                      AutoGenerateColumns="True"
+                      CanUserSortColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      />
+
+        </Grid>
 
         <StatusBar Grid.Row="2">
             <StatusBar.ItemsPanel>
@@ -75,6 +90,6 @@
                 <ProgressBar Minimum="0" Maximum="100" IsIndeterminate="{Binding IsOptimizing}" Width="90" Height="16" />
             </StatusBarItem>
         </StatusBar>
-        <DataGrid Grid.Row="1"/>
+        
     </Grid>
 </Window>
