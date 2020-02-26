@@ -1,13 +1,15 @@
-﻿<Window x:Class="Eugene.Desktop.MainWindow"
+﻿<Window x:Class="Eugene.Desktop.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:prism="http://prismlibrary.com/"
         xmlns:local="clr-namespace:Eugene.Desktop"
         xmlns:commands="clr-namespace:Eugene.Desktop.Commands"
+        prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Window.CommandBindings>
+    <!--<Window.CommandBindings>
         <CommandBinding Command="commands:EugeneCommands.Exit" Executed="ExitCommand_Executed" />
         <CommandBinding Command="commands:EugeneCommands.LoadDataset" Executed="LoadDatasetCommand_Executed" CanExecute="LoadDatasetCommand_CanExecuted" />
         <CommandBinding Command="commands:EugeneCommands.SaveDataset" Executed="SaveDatasetCommand_Executed" CanExecute="SaveDatasetCommand_CanExecuted" />
@@ -17,7 +19,7 @@
         <CommandBinding Command="commands:EugeneCommands.StartOptimization" Executed="StartOptimizationCommand_Executed" CanExecute="StartOptimizationCommand_CanExecuted" />
         <CommandBinding Command="commands:EugeneCommands.SaveResult" Executed="SaveResultCommand_Executed" CanExecute="SaveResultCommand_CanExecuted" />
         <CommandBinding Command="commands:EugeneCommands.ExportResult" Executed="ExportResultCommand_Executed" CanExecute="ExportResultCommand_CanExecuted" />
-    </Window.CommandBindings>
+    </Window.CommandBindings>-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -26,22 +28,23 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <MenuItem Header="Exit" Command="commands:EugeneCommands.Exit" />
+                <MenuItem Header="Exit" />
             </MenuItem>
             <MenuItem Header="Dataset">
-                <MenuItem Header="Load" Command="commands:EugeneCommands.LoadDataset" />
-                <MenuItem Header="Save" Command="commands:EugeneCommands.SaveDataset" />
+                <MenuItem Header="Load" Command="{Binding LoadDatasetCommand}" />
+                <!--<MenuItem Header="Save" Command="commands:EugeneCommands.SaveDataset" />
                 <MenuItem Header="Import" Command="commands:EugeneCommands.ImportDataset" />
                 <MenuItem Header="Export" Command="commands:EugeneCommands.ExportDataset" />
                 <Separator />
-                <MenuItem Header="Generate Random" Command="commands:EugeneCommands.GenerateDataset" />
+                <MenuItem Header="Generate Random" Command="commands:EugeneCommands.GenerateDataset" />-->
             </MenuItem>
             <MenuItem Header="Optimization">
-                <MenuItem Header="Start" Command="commands:EugeneCommands.StartOptimization" />
+                <!--<MenuItem Header="Start" Command="commands:EugeneCommands.StartOptimization" />-->
+                <MenuItem Header="Start" Command="{Binding StartOptimizationCommand}" />
             </MenuItem>
             <MenuItem Header="Result">
-                <MenuItem Header="Save" Command="commands:EugeneCommands.SaveResult" />
-                <MenuItem Header="Export" Command="commands:EugeneCommands.ExportResult" />
+                <!--<MenuItem Header="Save" Command="commands:EugeneCommands.SaveResult" />
+                <MenuItem Header="Export" Command="commands:EugeneCommands.ExportResult" />-->
             </MenuItem>
         </Menu>
 
@@ -65,12 +68,13 @@
             </StatusBarItem>
             <Separator Grid.Column="1" />
             <StatusBarItem Grid.Column="2">
-                <TextBlock Name="lblStatusMessage" />
+                <TextBlock Text="{Binding StatusMessage}" />
             </StatusBarItem>
             <Separator Grid.Column="3" />
             <StatusBarItem Grid.Column="4">
-                <ProgressBar Name="pbProgress" Minimum="0" Maximum="100" IsIndeterminate="false" Width="90" Height="16" />
+                <ProgressBar Minimum="0" Maximum="100" IsIndeterminate="{Binding IsOptimizing}" Width="90" Height="16" />
             </StatusBarItem>
         </StatusBar>
+        <DataGrid Grid.Row="1"/>
     </Grid>
 </Window>
