@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,6 +29,18 @@ namespace Eugene.Desktop.ViewModels
                 DatasetAsTable = ConvertDatasetToTable(_dataset);
 
                 SetStatusDataset();
+            }
+        }
+
+        private TestcaseBlockerDataset _resolvedDataset = null;
+        public TestcaseBlockerDataset ResolvedDataset
+        {
+            get { return _resolvedDataset; }
+            set
+            {
+                SetProperty(ref _resolvedDataset, value);
+
+                ResolvedDatasetAsTable = ConvertDatasetToTable(_resolvedDataset);
             }
         }
 
@@ -66,13 +79,19 @@ namespace Eugene.Desktop.ViewModels
             set { SetProperty(ref _datasetAsTable, value); }
         }
 
+        private DataTable _resolvedDatasetAsTable;
+        public DataTable ResolvedDatasetAsTable
+        {
+            get { return _resolvedDatasetAsTable; }
+            set { SetProperty(ref _resolvedDatasetAsTable, value); }
+        }
+
         private ObservableCollection<Blocker> _selectedBlockers = new ObservableCollection<Blocker>();
         public ObservableCollection<Blocker> SelectedBlockers
         {
             get { return _selectedBlockers; }
             set { SetProperty(ref _selectedBlockers, value); }
         }
-
 
         public MainWindowViewModel()
         {
@@ -106,6 +125,13 @@ namespace Eugene.Desktop.ViewModels
             ExportResultCommand = new DelegateCommand(ExportResult, CanExportResult)
                                                 .ObservesProperty(() => IsOptimizing)
                                                 .ObservesProperty(() => Result);
+
+            ResolveSelectedBlockersCommand = new DelegateCommand(ResolveSelectedBlockers, CanResolveSelectedBlockers)
+                                                .ObservesProperty(() => IsOptimizing)
+                                                .ObservesProperty(() => Dataset)
+                                                .ObservesProperty(() => SelectedBlockers);
+
+            NotifyBlockersSelectedCommand = new DelegateCommand(NotifyBlockersSelected, CanNotifyBlockersSelected);
 
         }
 
@@ -323,10 +349,43 @@ namespace Eugene.Desktop.ViewModels
         }
         private bool CanStartOptimization()
         {
-            if (Dataset != null)
-                return !IsOptimizing;
+            if (IsOptimizing)
+                return false;
 
-            return false;
+            if (Dataset == null)
+                return false;
+
+            return true;
+        }
+
+        public DelegateCommand ResolveSelectedBlockersCommand { get; private set; }
+        private async void ResolveSelectedBlockers()
+        {
+            var resolver = new BlockerResolver(Dataset.Blockers.ToList(), Dataset.Testcases.ToList());
+            ResolvedDataset = resolver.GetResolvedDataset(SelectedBlockers.Select(x => x.Id).ToList());
+        }
+        private bool CanResolveSelectedBlockers()
+        {
+            if (IsOptimizing)
+                return false;
+
+            if (Dataset == null)
+                return false;
+
+            //if (SelectedBlockers.Count <= 0)
+            //    return false;
+
+            return true;
+        }
+
+        public DelegateCommand NotifyBlockersSelectedCommand { get; private set; }
+        private void NotifyBlockersSelected()
+        {
+            ResolveSelectedBlockersCommand.RaiseCanExecuteChanged();
+        }
+        private bool CanNotifyBlockersSelected()
+        {
+            return true;
         }
         #endregion
 

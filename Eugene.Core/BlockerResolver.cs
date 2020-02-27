@@ -112,5 +112,29 @@ namespace Eugene.Core
             var blockedTestcases = DeepClone.GetDeepClone<List<Testcase>>(_originalTestcases.Where(x => x.BlockerIds.Count > 0).ToList());
             return blockedTestcases.Select(x => x.Id).ToList();
         }
+
+        public TestcaseBlockerDataset GetResolvedDataset(List<string> blockerIdsToResolve)
+        {
+            // Kopien der Originale erstellen
+            var allBlockers = DeepClone.GetDeepClone<List<Blocker>>(_originalBlockers.ToList());
+            var allTestcases = DeepClone.GetDeepClone<List<Testcase>>(_originalTestcases.ToList());
+
+
+            foreach (var testcase in allTestcases)
+            {
+                foreach (var blockerId in blockerIdsToResolve)
+                {
+                    testcase.BlockerIds.Remove(blockerId);
+                }
+            }
+
+            TestcaseBlockerDataset resolvedDataset = new TestcaseBlockerDataset
+            {
+                Blockers = allBlockers,
+                Testcases = allTestcases
+            };
+
+            return resolvedDataset;
+        }
     }
 }

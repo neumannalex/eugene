@@ -27,6 +27,8 @@
                 <MenuItem Header="Export" Command="{Binding ExportDatasetCommand}" />
                 <Separator />
                 <MenuItem Header="Generate Random" Command="{Binding GenerateDatasetCommand}" />
+                <Separator />
+                <MenuItem Header="Resolved selected Blockers" Command="{Binding ResolveSelectedBlockersCommand}" />
             </MenuItem>
             <MenuItem Header="Optimization">
                 <MenuItem Header="Start" Command="{Binding StartOptimizationCommand}" />
@@ -44,23 +46,44 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Orientation="Vertical">
-                <GroupBox Header="Blockers" MinHeight="200">
-                    <xctk:CheckListBox ItemsSource="{Binding Dataset.Blockers}" DisplayMemberPath="Name" SelectedItemsOverride="{Binding SelectedBlockers}" />
+            <Grid Grid.Column="0" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="3" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0" Header="Blockers" MinHeight="200">
+                    <xctk:CheckListBox ItemsSource="{Binding Dataset.Blockers}" DisplayMemberPath="Name" SelectedItemsOverride="{Binding SelectedBlockers}" Command="{Binding NotifyBlockersSelectedCommand}" />
                 </GroupBox>
-                <GroupBox Header="Resolution" MinHeight="200">
+
+                <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" />
+
+                <GroupBox Grid.Row="2" Header="Resolution" MinHeight="200">
                     <xctk:PropertyGrid SelectedObject="{Binding Result}" />
                 </GroupBox>
-            </StackPanel>
+            </Grid>
 
             <GridSplitter Grid.Column="1" ResizeDirection="Columns" HorizontalAlignment="Stretch" />
 
-            <DataGrid Grid.Column="2" ItemsSource="{Binding DatasetAsTable.DefaultView}"
+            <TabControl Grid.Column="2">
+                <TabItem Header="Original Dataset">
+                    <DataGrid ItemsSource="{Binding DatasetAsTable.DefaultView}"
                       AutoGenerateColumns="True"
                       CanUserSortColumns="False"
                       CanUserAddRows="False"
                       IsReadOnly="True"
                       />
+                </TabItem>
+                <TabItem Header="Resolved Dataset">
+                    <DataGrid ItemsSource="{Binding ResolvedDatasetAsTable.DefaultView}"
+                      AutoGenerateColumns="True"
+                      CanUserSortColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      />
+                </TabItem>
+            </TabControl>
+            
 
         </Grid>
 
