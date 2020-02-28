@@ -14,6 +14,90 @@ namespace Eugene.Core.Models
         public IList<Blocker> Blockers { get; set; } = new List<Blocker>();
         public IList<Testcase> Testcases { get; set; } = new List<Testcase>();
 
+        public IList<Testcase> BlockedTestcases
+        {
+            get
+            {
+                return Testcases.Where(x => x.BlockerIds.Count > 0).ToList();
+            }
+        }
+        public int NumberOfBlockedTestcases
+        {
+            get
+            {
+                return BlockedTestcases.Count;
+            }
+        }
+
+        public IList<Testcase> UnblockedTestcases
+        {
+            get
+            {
+                return Testcases.Where(x => x.BlockerIds.Count <= 0).ToList();
+            }
+        }
+        public int NumberOfUnblockedTestcases
+        {
+            get
+            {
+                return UnblockedTestcases.Count;
+            }
+        }
+
+        public IList<Blocker> UnresolvedBlockers
+        {
+            get
+            {
+                Dictionary<Blocker, int> blockedTestcasesCount = new Dictionary<Blocker, int>();
+                foreach(var blocker in Blockers)
+                {
+                    var count = 0;
+                    foreach(var testcase in Testcases)
+                    {
+                        if (testcase.BlockerIds.Contains(blocker.Id))
+                            count++;
+                    }
+                    blockedTestcasesCount.Add(blocker, count);
+                }
+
+                return blockedTestcasesCount.Where(x => x.Value > 0).Select(x => x.Key).ToList();
+            }
+        }
+        public int NumberOfUnresolvedBlockers
+        {
+            get
+            {
+                return UnresolvedBlockers.Count;
+            }
+        }
+
+        public IList<Blocker> ResolvedBlockers
+        {
+            get
+            {
+                Dictionary<Blocker, int> blockedTestcasesCount = new Dictionary<Blocker, int>();
+                foreach (var blocker in Blockers)
+                {
+                    var count = 0;
+                    foreach (var testcase in Testcases)
+                    {
+                        if (testcase.BlockerIds.Contains(blocker.Id))
+                            count++;
+                    }
+                    blockedTestcasesCount.Add(blocker, count);
+                }
+
+                return blockedTestcasesCount.Where(x => x.Value <= 0).Select(x => x.Key).ToList();
+            }
+        }
+        public int NumberOfResolvedBlockers
+        {
+            get
+            {
+                return ResolvedBlockers.Count;
+            }
+        }
+
         public override string ToString()
         {
             var sb = new StringBuilder();

@@ -58,11 +58,11 @@ namespace Eugene.Desktop.ViewModels
             set { _optimizer = value; }
         }
 
-        private bool _isOptimizing = false;
-        public bool IsOptimizing
+        private bool _isRunning = false;
+        public bool IsRunning
         {
-            get { return _isOptimizing; }
-            set { SetProperty(ref _isOptimizing, value); }
+            get { return _isRunning; }
+            set { SetProperty(ref _isRunning, value); }
         }
 
         private string _statusMessage;
@@ -98,36 +98,36 @@ namespace Eugene.Desktop.ViewModels
             ExitApplicationCommand = new DelegateCommand(ExitApplication, CanExitApplication);
 
             LoadDatasetCommand = new DelegateCommand(LoadDataset, CanLoadDataset)
-                                                .ObservesProperty(() => IsOptimizing);
+                                                .ObservesProperty(() => IsRunning);
 
             SaveDatasetCommand = new DelegateCommand(SaveDataset, CanSaveDataset)
-                                                .ObservesProperty(() => IsOptimizing)
+                                                .ObservesProperty(() => IsRunning)
                                                 .ObservesProperty(() => Dataset);
 
             ImportDatasetCommand = new DelegateCommand(ImportDataset, CanImportDataset)
-                                                .ObservesProperty(() => IsOptimizing);
+                                                .ObservesProperty(() => IsRunning);
 
             ExportDatasetCommand = new DelegateCommand(ExportDataset, CanExportDataset)
-                                                .ObservesProperty(() => IsOptimizing)
+                                                .ObservesProperty(() => IsRunning)
                                                 .ObservesProperty(() => Dataset);
 
             GenerateDatasetCommand = new DelegateCommand(GenerateDataset, CanGenerateDataset)
-                                                .ObservesProperty(() => IsOptimizing);
+                                                .ObservesProperty(() => IsRunning);
 
             StartOptimizationCommand = new DelegateCommand(StartOptimization, CanStartOptimization)
-                                                .ObservesProperty(() => IsOptimizing)
+                                                .ObservesProperty(() => IsRunning)
                                                 .ObservesProperty(() => Dataset);
 
             SaveResultCommand = new DelegateCommand(SaveResult, CanSaveResult)
-                                                .ObservesProperty(() => IsOptimizing)
+                                                .ObservesProperty(() => IsRunning)
                                                 .ObservesProperty(() => Result);
 
             ExportResultCommand = new DelegateCommand(ExportResult, CanExportResult)
-                                                .ObservesProperty(() => IsOptimizing)
+                                                .ObservesProperty(() => IsRunning)
                                                 .ObservesProperty(() => Result);
 
             ResolveSelectedBlockersCommand = new DelegateCommand(ResolveSelectedBlockers, CanResolveSelectedBlockers)
-                                                .ObservesProperty(() => IsOptimizing)
+                                                .ObservesProperty(() => IsRunning)
                                                 .ObservesProperty(() => Dataset)
                                                 .ObservesProperty(() => SelectedBlockers);
 
@@ -170,7 +170,7 @@ namespace Eugene.Desktop.ViewModels
         }
         private bool CanLoadDataset()
         {
-            if (IsOptimizing)
+            if (IsRunning)
                 return false;
 
             return true;
@@ -193,7 +193,7 @@ namespace Eugene.Desktop.ViewModels
         }
         private bool CanSaveDataset()
         {
-            if (IsOptimizing)
+            if (IsRunning)
                 return false;
 
             if (Dataset == null)
@@ -236,7 +236,7 @@ namespace Eugene.Desktop.ViewModels
         }
         private bool CanImportDataset()
         {
-            if (IsOptimizing)
+            if (IsRunning)
                 return false;
 
             return true;
@@ -259,7 +259,7 @@ namespace Eugene.Desktop.ViewModels
         }
         private bool CanExportDataset()
         {
-            if (IsOptimizing)
+            if (IsRunning)
                 return false;
 
             if (Dataset == null)
@@ -275,7 +275,7 @@ namespace Eugene.Desktop.ViewModels
         }
         private bool CanGenerateDataset()
         {
-            if (IsOptimizing)
+            if (IsRunning)
                 return false;
 
             return true;
@@ -298,7 +298,7 @@ namespace Eugene.Desktop.ViewModels
         }
         private bool CanSaveResult()
         {
-            if (IsOptimizing)
+            if (IsRunning)
                 return false;
 
             if (Result == null)
@@ -314,7 +314,7 @@ namespace Eugene.Desktop.ViewModels
         }
         private bool CanExportResult()
         {
-            if (IsOptimizing)
+            if (IsRunning)
                 return false;
 
             if (Result == null)
@@ -327,7 +327,7 @@ namespace Eugene.Desktop.ViewModels
         public DelegateCommand StartOptimizationCommand { get; private set; }
         private async void StartOptimization()
         {
-            IsOptimizing = true;
+            IsRunning = true;
 
             var watch = new Stopwatch();
             watch.Start();
@@ -340,16 +340,18 @@ namespace Eugene.Desktop.ViewModels
 
             var duration = TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds);
             watch.Stop();
-            IsOptimizing = false;
+            IsRunning = false;
 
             SelectedBlockers.Clear();
             SelectedBlockers.AddRange(Result.ResolvedBlockers);
 
             SetStatusMessage($"Finished in {duration}.");
+
+            ResolveSelectedBlockersCommand.Execute();
         }
         private bool CanStartOptimization()
         {
-            if (IsOptimizing)
+            if (IsRunning)
                 return false;
 
             if (Dataset == null)
@@ -361,12 +363,19 @@ namespace Eugene.Desktop.ViewModels
         public DelegateCommand ResolveSelectedBlockersCommand { get; private set; }
         private async void ResolveSelectedBlockers()
         {
-            var resolver = new BlockerResolver(Dataset.Blockers.ToList(), Dataset.Testcases.ToList());
-            ResolvedDataset = resolver.GetResolvedDataset(SelectedBlockers.Select(x => x.Id).ToList());
+            IsRunning = true;
+            await Task.Run(() =>
+            {
+                var resolver = new BlockerResolver(Dataset.Blockers.ToList(), Dataset.Testcases.ToList());
+                ResolvedDataset = resolver.GetResolvedDataset(SelectedBlockers.Select(x => x.Id).ToList());
+            });
+            IsRunning = false;
+
+            SetStatusMessage($"{SelectedBlockers.Count} Blockers resolved.");
         }
         private bool CanResolveSelectedBlockers()
         {
-            if (IsOptimizing)
+            if (IsRunning)
                 return false;
 
             if (Dataset == null)

@@ -7,9 +7,13 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:Eugene.Desktop"
         xmlns:commands="clr-namespace:Eugene.Desktop.Commands"
+        xmlns:converters="clr-namespace:Eugene.Desktop.Converters"
         prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -53,7 +57,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <GroupBox Grid.Row="0" Header="Blockers" MinHeight="200">
-                    <xctk:CheckListBox ItemsSource="{Binding Dataset.Blockers}" DisplayMemberPath="Name" SelectedItemsOverride="{Binding SelectedBlockers}" Command="{Binding NotifyBlockersSelectedCommand}" />
+                    <xctk:CheckListBox ItemsSource="{Binding Dataset.Blockers}" DisplayMemberPath="Name" SelectedItemsOverride="{Binding SelectedBlockers}" Command="{Binding NotifyBlockersSelectedCommand}" IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBooleanConverter}}" />
                 </GroupBox>
 
                 <GridSplitter Grid.Row="1" ResizeDirection="Rows" HorizontalAlignment="Stretch" />
@@ -61,30 +65,88 @@
                 <GroupBox Grid.Row="2" Header="Resolution" MinHeight="200">
                     <xctk:PropertyGrid SelectedObject="{Binding Result}" />
                 </GroupBox>
-            </Grid>
+            </Grid> 
 
             <GridSplitter Grid.Column="1" ResizeDirection="Columns" HorizontalAlignment="Stretch" />
 
             <TabControl Grid.Column="2">
                 <TabItem Header="Original Dataset">
-                    <DataGrid ItemsSource="{Binding DatasetAsTable.DefaultView}"
-                      AutoGenerateColumns="True"
-                      CanUserSortColumns="False"
-                      CanUserAddRows="False"
-                      IsReadOnly="True"
-                      />
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="1" Grid.Column="0">Blockers</Label>
+                            <Label Grid.Row="2" Grid.Column="0">Testcases</Label>
+                            
+                            <Label Grid.Row="0" Grid.Column="1">Resolved</Label>
+                            <Label Grid.Row="0" Grid.Column="2">Unresolved</Label>
+
+                            <Label Grid.Row="1" Grid.Column="1" Content="{Binding Dataset.NumberOfResolvedBlockers}" />
+                            <Label Grid.Row="1" Grid.Column="2" Content="{Binding Dataset.NumberOfUnresolvedBlockers}" />
+
+                            <Label Grid.Row="2" Grid.Column="1" Content="{Binding Dataset.NumberOfUnblockedTestcases}" />
+                            <Label Grid.Row="2" Grid.Column="2" Content="{Binding Dataset.NumberOfBlockedTestcases}" />
+
+                        </Grid>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding DatasetAsTable.DefaultView}"
+                                AutoGenerateColumns="True"
+                                CanUserSortColumns="False"
+                                CanUserAddRows="False"
+                                IsReadOnly="True" />
+                    </Grid>
+                    
                 </TabItem>
                 <TabItem Header="Resolved Dataset">
-                    <DataGrid ItemsSource="{Binding ResolvedDatasetAsTable.DefaultView}"
-                      AutoGenerateColumns="True"
-                      CanUserSortColumns="False"
-                      CanUserAddRows="False"
-                      IsReadOnly="True"
-                      />
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="1" Grid.Column="0">Blockers</Label>
+                            <Label Grid.Row="2" Grid.Column="0">Testcases</Label>
+
+                            <Label Grid.Row="0" Grid.Column="1">Resolved</Label>
+                            <Label Grid.Row="0" Grid.Column="2">Unresolved</Label>
+
+                            <Label Grid.Row="1" Grid.Column="1" Content="{Binding ResolvedDataset.NumberOfResolvedBlockers}" />
+                            <Label Grid.Row="1" Grid.Column="2" Content="{Binding ResolvedDataset.NumberOfUnresolvedBlockers}" />
+
+                            <Label Grid.Row="2" Grid.Column="1" Content="{Binding ResolvedDataset.NumberOfUnblockedTestcases}" />
+                            <Label Grid.Row="2" Grid.Column="2" Content="{Binding ResolvedDataset.NumberOfBlockedTestcases}" />
+                        </Grid>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding ResolvedDatasetAsTable.DefaultView}"
+                                AutoGenerateColumns="True"
+                                CanUserSortColumns="False"
+                                CanUserAddRows="False"
+                                IsReadOnly="True" />
+                    </Grid>
                 </TabItem>
             </TabControl>
-            
-
         </Grid>
 
         <StatusBar Grid.Row="2">
@@ -110,7 +172,7 @@
             </StatusBarItem>
             <Separator Grid.Column="3" />
             <StatusBarItem Grid.Column="4">
-                <ProgressBar Minimum="0" Maximum="100" IsIndeterminate="{Binding IsOptimizing}" Width="90" Height="16" />
+                <ProgressBar Minimum="0" Maximum="100" IsIndeterminate="{Binding IsRunning}" Width="90" Height="16" />
             </StatusBarItem>
         </StatusBar>
         
