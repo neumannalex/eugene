@@ -15,16 +15,16 @@ namespace Eugene.Core.Models
             ResolvedDataset = resolvedDataset;
         }
 
-        public int NumberOfResolvedBlockersDifference
-        {
-            get
-            {
-                if (OriginalDataset == null || ResolvedDataset == null)
-                    return 0;
+        //public int NumberOfResolvedBlockersDifference
+        //{
+        //    get
+        //    {
+        //        if (OriginalDataset == null || ResolvedDataset == null)
+        //            return 0;
 
-                return ResolvedDataset.NumberOfResolvedBlockers - OriginalDataset.NumberOfResolvedBlockers;
-            }
-        }
+        //        return ResolvedDataset.NumberOfResolvedBlockers - OriginalDataset.NumberOfResolvedBlockers;
+        //    }
+        //}
 
         public int NumberOfUnresolvedBlockersDifference
         {

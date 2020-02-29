@@ -9,140 +9,41 @@ namespace Eugene.Core
 {
     public class BlockerResolver
     {
-        private readonly List<Blocker> _originalBlockers = new List<Blocker>();
-        private readonly List<Testcase> _originalTestcases = new List<Testcase>();
+        private TestcaseBlockerDataset _initialDataset;
 
-        public BlockerResolver(List<Blocker> blockers, List<Testcase> testcases)
+        public BlockerResolver(TestcaseBlockerDataset initialDataset)
         {
-            _originalBlockers = blockers;
-            _originalTestcases = testcases;
+            _initialDataset = initialDataset;
         }
 
-        public double GetValueOfTestcases(List<string> testcaseIds)
+        public BlockerResolverResult Resolve(List<Blocker> blockers)
         {
-            var value = 0.0;
+            var localDataset = (TestcaseBlockerDataset)CloneHelper.GetDeepClone(_initialDataset);
 
-            for (int i = 0; i < testcaseIds.Count; i++)
-                value += GetCostOfTestcase(testcaseIds[i]);
-
-            return value;
-        }
-
-        public double GetValueOfTestcases(List<Testcase> testcases)
-        {
-            return GetValueOfTestcases(testcases.Select(x => x.Id).ToList());
-        }
-
-        public double GetCostOfTestcase(string testcaseId)
-        {
-            var existingTestcase = _originalTestcases.Where(x => x.Id == testcaseId).FirstOrDefault();
-            if(existingTestcase != null)
+            // Remove Blockers from Testcases
+            foreach (var testcase in localDataset.Testcases)
             {
-                return existingTestcase.Weight;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-        public double GetCostOfTestcase(Testcase testcase)
-        {
-            return GetCostOfTestcase(testcase.Id);
-        }
-
-        public double GetCostOfBlockers(List<string> blockerIds)
-        {
-            var cost = 0.0;
-
-            for (int i = 0; i < blockerIds.Count; i++)
-                cost += GetCostOfBlocker(blockerIds[i], i);
-
-            return cost;
-        }
-
-        public double GetCostOfBlockers(List<Blocker> blockers)
-        {
-            return GetCostOfBlockers(blockers.Select(x => x.Id).ToList());
-        }
-
-        public double GetCostOfBlocker(string blockerId, int rank = 0)
-        {
-            var blocker = _originalBlockers.Where(x => x.Id == blockerId).FirstOrDefault();
-            if(blocker != null)
-            {
-                return blocker.Cost;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-        public double GetCostOfBlocker(Blocker blocker, int rank = 0)
-        {
-            return GetCostOfBlocker(blocker.Id, rank);
-        }
-
-        public List<Testcase> GetTestcasesResolvedByBlockers(List<string> blockerIds)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<Testcase> GetUnblockedTestcases()
-        {
-            var unblockedTestcases = DeepClone.GetDeepClone<List<Testcase>>(_originalTestcases.Where(x => x.BlockerIds.Count <= 0).ToList());
-            return unblockedTestcases;
-        }
-
-        public List<string> GetUnblockedTestcaseIds()
-        {
-            var unblockedTestcases = DeepClone.GetDeepClone<List<Testcase>>(_originalTestcases.Where(x => x.BlockerIds.Count <= 0).ToList());
-            return unblockedTestcases.Select(x => x.Id).ToList();
-        }
-
-        public List<Testcase> GetBlockedTestcases()
-        {
-            var blockedTestcases = DeepClone.GetDeepClone<List<Testcase>>(_originalTestcases.Where(x => x.BlockerIds.Count > 0).ToList());
-            return blockedTestcases;
-        }
-
-        public List<string> GetBlockedTestcaseIds()
-        {
-            var blockedTestcases = DeepClone.GetDeepClone<List<Testcase>>(_originalTestcases.Where(x => x.BlockerIds.Count > 0).ToList());
-            return blockedTestcases.Select(x => x.Id).ToList();
-        }
-
-        public BlockerResolutionResult GetResolution(List<string> blockerIdsToResolve)
-        {
-            // Kopien der Originale erstellen
-            var allBlockers = DeepClone.GetDeepClone<List<Blocker>>(_originalBlockers.ToList());
-            var allTestcases = DeepClone.GetDeepClone<List<Testcase>>(_originalTestcases.ToList());
-
-
-            foreach (var testcase in allTestcases)
-            {
-                foreach (var blockerId in blockerIdsToResolve)
+                foreach (var blocker in blockers)
                 {
-                    testcase.BlockerIds.Remove(blockerId);
+                    testcase.BlockerIds.Remove(blocker.Id);
                 }
             }
 
-            TestcaseBlockerDataset resolvedDataset = new TestcaseBlockerDataset
+            // Remove Blockers from Dataset
+            var blockersToRemove = new List<Blocker>();
+            foreach(var blocker in localDataset.Blockers)
             {
-                Blockers = allBlockers,
-                Testcases = allTestcases
-            };
+                var numBlockedTestcases = localDataset.Testcases.Where(x => x.BlockerIds.Contains(blocker.Id)).Count();
+                if (numBlockedTestcases <= 0)
+                    blockersToRemove.Add(blocker);
+            }
 
-            return new BlockerResolutionResult(
-                new TestcaseBlockerDataset { 
-                    Blockers = allBlockers,
-                    Testcases = DeepClone.GetDeepClone<List<Testcase>>(_originalTestcases.ToList())
-                },
-                new TestcaseBlockerDataset {
-                    Blockers = allBlockers,
-                    Testcases = allTestcases
-                });
+            foreach (var blocker in blockersToRemove)
+                localDataset.Blockers.Remove(blocker);
+
+            var result = new BlockerResolverResult(_initialDataset, localDataset);
+
+            return result;
         }
     }
 }

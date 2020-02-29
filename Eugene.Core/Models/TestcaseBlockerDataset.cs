@@ -71,33 +71,6 @@ namespace Eugene.Core.Models
             }
         }
 
-        public IList<Blocker> ResolvedBlockers
-        {
-            get
-            {
-                Dictionary<Blocker, int> blockedTestcasesCount = new Dictionary<Blocker, int>();
-                foreach (var blocker in Blockers)
-                {
-                    var count = 0;
-                    foreach (var testcase in Testcases)
-                    {
-                        if (testcase.BlockerIds.Contains(blocker.Id))
-                            count++;
-                    }
-                    blockedTestcasesCount.Add(blocker, count);
-                }
-
-                return blockedTestcasesCount.Where(x => x.Value <= 0).Select(x => x.Key).ToList();
-            }
-        }
-        public int NumberOfResolvedBlockers
-        {
-            get
-            {
-                return ResolvedBlockers.Count;
-            }
-        }
-
         public override string ToString()
         {
             var sb = new StringBuilder();

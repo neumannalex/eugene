@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eugene.Core", "Eugene.Core\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eugene", "Eugene.Console\Eugene.csproj", "{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eugene.Desktop", "Eugene.Desktop\Eugene.Desktop.csproj", "{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eugene.Desktop", "Eugene.Desktop\Eugene.Desktop.csproj", "{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTestProject1", "NUnitTestProject1\NUnitTestProject1.csproj", "{E7B1B881-3362-46E1-96BC-3A8A2E753DFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7B1B881-3362-46E1-96BC-3A8A2E753DFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7B1B881-3362-46E1-96BC-3A8A2E753DFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7B1B881-3362-46E1-96BC-3A8A2E753DFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7B1B881-3362-46E1-96BC-3A8A2E753DFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
