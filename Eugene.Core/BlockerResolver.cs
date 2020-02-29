@@ -113,7 +113,7 @@ namespace Eugene.Core
             return blockedTestcases.Select(x => x.Id).ToList();
         }
 
-        public TestcaseBlockerDataset GetResolvedDataset(List<string> blockerIdsToResolve)
+        public BlockerResolutionResult GetResolution(List<string> blockerIdsToResolve)
         {
             // Kopien der Originale erstellen
             var allBlockers = DeepClone.GetDeepClone<List<Blocker>>(_originalBlockers.ToList());
@@ -134,7 +134,15 @@ namespace Eugene.Core
                 Testcases = allTestcases
             };
 
-            return resolvedDataset;
+            return new BlockerResolutionResult(
+                new TestcaseBlockerDataset { 
+                    Blockers = allBlockers,
+                    Testcases = DeepClone.GetDeepClone<List<Testcase>>(_originalTestcases.ToList())
+                },
+                new TestcaseBlockerDataset {
+                    Blockers = allBlockers,
+                    Testcases = allTestcases
+                });
         }
     }
 }

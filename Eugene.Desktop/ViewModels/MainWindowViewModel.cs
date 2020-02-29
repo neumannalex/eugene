@@ -86,6 +86,13 @@ namespace Eugene.Desktop.ViewModels
             set { SetProperty(ref _resolvedDatasetAsTable, value); }
         }
 
+        private BlockerResolutionResult _resolution;
+        public BlockerResolutionResult Resolution
+        {
+            get { return _resolution; }
+            set { SetProperty(ref _resolution, value); }
+        }
+
         private ObservableCollection<Blocker> _selectedBlockers = new ObservableCollection<Blocker>();
         public ObservableCollection<Blocker> SelectedBlockers
         {
@@ -367,7 +374,8 @@ namespace Eugene.Desktop.ViewModels
             await Task.Run(() =>
             {
                 var resolver = new BlockerResolver(Dataset.Blockers.ToList(), Dataset.Testcases.ToList());
-                ResolvedDataset = resolver.GetResolvedDataset(SelectedBlockers.Select(x => x.Id).ToList());
+                Resolution = resolver.GetResolution(SelectedBlockers.Select(x => x.Id).ToList());
+                ResolvedDataset = Resolution.ResolvedDataset;
             });
             IsRunning = false;
 

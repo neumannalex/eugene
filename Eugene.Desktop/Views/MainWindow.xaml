@@ -133,11 +133,36 @@
                             <Label Grid.Row="0" Grid.Column="1">Resolved</Label>
                             <Label Grid.Row="0" Grid.Column="2">Unresolved</Label>
 
-                            <Label Grid.Row="1" Grid.Column="1" Content="{Binding ResolvedDataset.NumberOfResolvedBlockers}" />
-                            <Label Grid.Row="1" Grid.Column="2" Content="{Binding ResolvedDataset.NumberOfUnresolvedBlockers}" />
+                            <TextBlock Grid.Row="1" Grid.Column="1">
+                                <Run Text="{Binding ResolvedDataset.NumberOfResolvedBlockers, Mode=OneWay}" />
+                                <Run>(</Run>
+                                <Run Text="{Binding Resolution.NumberOfResolvedBlockersDifference, Mode=OneWay}" />
+                                <Run>)</Run>
+                            </TextBlock>
+                            <!--<Label Grid.Row="1" Grid.Column="1" Content="{Binding ResolvedDataset.NumberOfResolvedBlockers}" />-->
+                            <!--<Label Grid.Row="1" Grid.Column="2" Content="{Binding ResolvedDataset.NumberOfUnresolvedBlockers}" />-->
+                            <TextBlock Grid.Row="1" Grid.Column="2">
+                                <Run Text="{Binding ResolvedDataset.NumberOfUnresolvedBlockers, Mode=OneWay}" />
+                                <Run>(</Run>
+                                <Run Text="{Binding Resolution.NumberOfUnresolvedBlockersDifference, Mode=OneWay}" />
+                                <Run>)</Run>
+                            </TextBlock>
 
-                            <Label Grid.Row="2" Grid.Column="1" Content="{Binding ResolvedDataset.NumberOfUnblockedTestcases}" />
-                            <Label Grid.Row="2" Grid.Column="2" Content="{Binding ResolvedDataset.NumberOfBlockedTestcases}" />
+                            <!--<Label Grid.Row="2" Grid.Column="1" Content="{Binding ResolvedDataset.NumberOfUnblockedTestcases}" />
+                            <Label Grid.Row="2" Grid.Column="2" Content="{Binding ResolvedDataset.NumberOfBlockedTestcases}" />-->
+
+                            <TextBlock Grid.Row="2" Grid.Column="1">
+                                <Run Text="{Binding ResolvedDataset.NumberOfUnblockedTestcases, Mode=OneWay}" />
+                                <Run>(</Run>
+                                <Run Text="{Binding Resolution.NumberOfUnblockedTestcasesDifference, Mode=OneWay}" />
+                                <Run>)</Run>
+                            </TextBlock>
+                            <TextBlock Grid.Row="2" Grid.Column="2">
+                                <Run Text="{Binding ResolvedDataset.NumberOfBlockedTestcases, Mode=OneWay}" />
+                                <Run>(</Run>
+                                <Run Text="{Binding Resolution.NumberOfBlockedTestcasesDifference, Mode=OneWay}" />
+                                <Run>)</Run>
+                            </TextBlock>
                         </Grid>
                         <DataGrid Grid.Row="1" ItemsSource="{Binding ResolvedDatasetAsTable.DefaultView}"
                                 AutoGenerateColumns="True"
