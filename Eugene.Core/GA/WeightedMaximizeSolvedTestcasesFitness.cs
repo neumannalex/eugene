@@ -12,30 +12,7 @@ namespace Eugene.Core.GA
     public class WeightedMaximizeSolvedTestcasesFitness : IFitness
     {
         private readonly TestcaseBlockerDataset _dataset;
-
-        private double MaximumCost
-        {
-            get
-            {
-                // Lineare Kosten
-                //return _dataset.Blockers.Sum(x => x.Cost);
-
-                var cost = 0.0;
-
-                for(int i = 0; i < _dataset.Blockers.Count; i++)
-                    cost += GetBlockerCost(_dataset.Blockers[i], i);
-
-                return cost;
-            }
-        }
-
-        private double MaximumValue
-        {
-            get
-            {
-                return _dataset.Testcases.Where(x => x.BlockerIds.Count > 0).Sum(x => x.Weight);
-            }
-        }
+        private BlockerResolver _resolver;
 
         public event EventHandler Evaluated;
         protected virtual void OnEvaluated(ChromosomeEvaluatedEventArgs e)
@@ -50,41 +27,29 @@ namespace Eugene.Core.GA
         public WeightedMaximizeSolvedTestcasesFitness(TestcaseBlockerDataset configuration)
         {
             _dataset = configuration;
+            _resolver = new BlockerResolver(_dataset);
         }
 
         public double Evaluate(IChromosome chromosome)
         {
-            var maxToleratedCost = 3.0;
-
             var myChromosome = chromosome as BlockedTestcasesChromosome;
             var genes = myChromosome.GetGenes().Select(x => (bool)x.Value).ToList();
 
             var blockersToResolve = GetBlockersToResolveFromChromosome(myChromosome);
-            var resolvedTestcases = GetTestcasesForResolvedBlockers(blockersToResolve);
 
-            if (blockersToResolve.Count <= 0 || resolvedTestcases.Count <= 0)
-                return 0;
+            var resolution = _resolver.Resolve(blockersToResolve);
 
-            var cost = GetCostForResolvedBlockers(blockersToResolve);
-            if (cost > maxToleratedCost)
-            {
-                var exceed = cost - maxToleratedCost;
-                cost = maxToleratedCost = Math.Pow(2, exceed);
-            }
-
-            var value = GetValueForResolvedTestcases(resolvedTestcases);
-            value /= MaximumValue;
+            var cost = _dataset.GetCostForBlockers(resolution.ResolvedBlockers);
+            var value = _dataset.GetValueForTestcases(resolution.ResolvedTestcases);
+            value /= _dataset.TotalValue;
 
             double fitness = value / cost;
-
-            //OnEvaluated(new ChromosomeEvaluatedEventArgs(fitness, value, cost, blockersToResolve, resolvedTestcases, genes));
 
             return fitness;
         }
 
         private List<Blocker> GetBlockersToResolveFromChromosome(BlockedTestcasesChromosome chromosome)
         {
-            var allBlockers = DeepClone.GetDeepClone<List<Blocker>>(_dataset.Blockers.ToList());
             var blockers = new List<Blocker>();
 
             var genes = chromosome.GetGenes();
@@ -92,60 +57,11 @@ namespace Eugene.Core.GA
             {
                 if ((bool)genes[i].Value == true)
                 {
-                    blockers.Add(allBlockers[i]);
+                    blockers.Add(_dataset.Blockers[i]);
                 }
             }
 
             return blockers;
-        }
-
-        private List<Testcase> GetTestcasesForResolvedBlockers(List<Blocker> resolvedBlockers)
-        {
-            var allTestcases = DeepClone.GetDeepClone<List<Testcase>>(_dataset.Testcases.Where(x => x.BlockerIds.Count > 0).ToList());
-            var resolvedTestcases = new List<Testcase>();
-
-            foreach (var testcase in allTestcases)
-            {
-                foreach (var blocker in resolvedBlockers)
-                {
-                    if (testcase.BlockerIds.Contains(blocker.Id))
-                    {
-                        testcase.BlockerIds.Remove(blocker.Id);
-                    }
-                }
-
-                if (testcase.BlockerIds.Count <= 0)
-                {
-                    resolvedTestcases.Add(testcase);
-                }
-            }
-
-            return resolvedTestcases;
-        }
-
-        public double GetValueForResolvedTestcases(List<Testcase> resolvedTestcases)
-        {
-            // Lineare Kosten
-            return resolvedTestcases.Sum(x => x.Weight);
-        }
-
-        public double GetCostForResolvedBlockers(List<Blocker> resolvedBlockers)
-        {
-            // Lineare Kosten
-            //return resolvedBlockers.Sum(x => x.Cost);
-
-            var cost = 0.0;
-
-            for (int i = 0; i < resolvedBlockers.Count; i++)
-                cost += GetBlockerCost(resolvedBlockers[i], i);
-
-            return cost;
-        }
-
-        private double GetBlockerCost(Blocker blocker, int rank = 0)
-        {
-            //return Math.Pow(2, rank) * blocker.Cost;
-            return blocker.Cost;
         }
     }
 }

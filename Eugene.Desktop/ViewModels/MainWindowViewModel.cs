@@ -438,8 +438,7 @@ namespace Eugene.Desktop.ViewModels
 
             table.Columns.Add(new DataColumn("Number of Blockers", typeof(int)));
 
-            // Zeilen
-            
+            // Zeilen            
             for (var testcaseIndex = 0; testcaseIndex < dataset.Testcases.Count; testcaseIndex++)
             {
                 var testcase = dataset.Testcases[testcaseIndex];

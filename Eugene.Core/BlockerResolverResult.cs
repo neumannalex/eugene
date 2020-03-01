@@ -57,5 +57,35 @@ namespace Eugene.Core
                 return resolvedBlockers.ToList();
             }
         }
+
+        public List<Testcase> UnresolvedTestcases
+        {
+            get
+            {
+                if (ResolvedDataset == null)
+                    return new List<Testcase>();
+
+                return ResolvedDataset.BlockedTestcases.ToList();
+            }
+        }
+
+        public List<Testcase> ResolvedTestcases
+        {
+            get
+            {
+                if (InitialDataset == null)
+                    return new List<Testcase>();
+
+                if (ResolvedDataset == null)
+                    return new List<Testcase>();
+
+                var initialDatasetTestcases= InitialDataset.UnblockedTestcases;
+                var resolvedDatasetTestcases = ResolvedDataset.UnblockedTestcases;
+
+                var resolvedTestcases = resolvedDatasetTestcases.Except(initialDatasetTestcases);
+
+                return resolvedTestcases.ToList();
+            }
+        }
     }
 }

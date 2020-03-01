@@ -20,6 +20,7 @@ namespace Eugene.Core
     {
         private int _generationCounter = 0;
         private readonly TestcaseBlockerDataset _dataset;
+        private BlockerResolver _resolver;
 
         private GeneticAlgorithm _ga;
         private WeightedMaximizeSolvedTestcasesFitness _fitness;
@@ -54,6 +55,7 @@ namespace Eugene.Core
         public Optimizer(TestcaseBlockerDataset dataset)
         {
             _dataset = dataset;
+            _resolver = new BlockerResolver(_dataset);
         }
 
         public OptimizationResult Optimize()
@@ -72,18 +74,20 @@ namespace Eugene.Core
                                                 new GenerationNumberTermination(10000),
                                                 new TimeEvolvingTermination(TimeSpan.FromMinutes(5)));
 
-            _ga.GenerationRan += Ga_GenerationRan;
-            _fitness.Evaluated += Fitness_Evaluated;
+            //_ga.GenerationRan += Ga_GenerationRan;
+            //_fitness.Evaluated += Fitness_Evaluated;
 
             _ga.Start();
 
-            var resolvedBlockers = GetBlockersToResolve(_ga.BestChromosome);
-            var resolvedTestcases = GetResolvedTestcases(resolvedBlockers);
-            var resolvedTestcasesIncludingUnblocked = GetResolvedTestcasesIncludingUnblocked(resolvedBlockers);
+            var resolvedBlockers = GetBlockersToResolve(_ga.BestChromosome);            
+            var resolution = _resolver.Resolve(resolvedBlockers);
 
-            var cost = _fitness.GetCostForResolvedBlockers(resolvedBlockers);
-            var value = _fitness.GetValueForResolvedTestcases(resolvedTestcases);
-            var valueIncludingUnblocked = _fitness.GetValueForResolvedTestcases(resolvedTestcasesIncludingUnblocked);
+            var resolvedTestcases = resolution.ResolvedTestcases;
+            var resolvedTestcasesIncludingUnblocked = resolution.ResolvedDataset.Testcases.Where(x => x.BlockerIds.Count <= 0).ToList();// GetResolvedTestcasesIncludingUnblocked(resolvedBlockers);
+
+            var cost = _dataset.GetCostForBlockers(resolvedBlockers);
+            var value = _dataset.GetValueForTestcases(resolvedTestcases);
+            var valueIncludingUnblocked = _dataset.GetValueForTestcases(resolvedTestcasesIncludingUnblocked);
 
             var optimizationResult = new OptimizationResult(_ga.BestChromosome.Fitness.Value, value, valueIncludingUnblocked, cost, resolvedBlockers, resolvedTestcases, resolvedTestcasesIncludingUnblocked);
             return optimizationResult;
@@ -104,54 +108,6 @@ namespace Eugene.Core
             return blockersToResolve;
         }
 
-        private List<Testcase> GetResolvedTestcases(List<Blocker> blockers)
-        {
-            var allTestcases = DeepClone.GetDeepClone<List<Testcase>>(_dataset.Testcases.Where(x => x.BlockerIds.Count > 0).ToList());
-            var resolvedTestcases = new List<Testcase>();
-
-            foreach(var testcase in allTestcases)
-            {
-                foreach(var blocker in blockers)
-                {
-                    if(testcase.BlockerIds.Contains(blocker.Id))
-                    {
-                        testcase.BlockerIds.Remove(blocker.Id);
-                    }
-                }
-
-                if(testcase.BlockerIds.Count <= 0)
-                {
-                    resolvedTestcases.Add(testcase);
-                }
-            }
-
-            return resolvedTestcases;
-        }
-
-        private List<Testcase> GetResolvedTestcasesIncludingUnblocked(List<Blocker> blockers)
-        {
-            var allTestcases = DeepClone.GetDeepClone<List<Testcase>>(_dataset.Testcases.ToList());
-            var resolvedTestcases = new List<Testcase>();
-
-            foreach (var testcase in allTestcases)
-            {
-                foreach (var blocker in blockers)
-                {
-                    if (testcase.BlockerIds.Contains(blocker.Id))
-                    {
-                        testcase.BlockerIds.Remove(blocker.Id);
-                    }
-                }
-
-                if (testcase.BlockerIds.Count <= 0)
-                {
-                    resolvedTestcases.Add(testcase);
-                }
-            }
-
-            return resolvedTestcases;
-        }
-
         private void Fitness_Evaluated(object sender, EventArgs e)
         {
             var args = e as ChromosomeEvaluatedEventArgs;
@@ -163,10 +119,11 @@ namespace Eugene.Core
             var genes = _ga.BestChromosome.GetGenes().Select(x => (bool)x.Value).ToList();
 
             var resolvedBlockers = GetBlockersToResolve(_ga.BestChromosome);
-            var resolvedTestcases = GetResolvedTestcases(resolvedBlockers);
+            var resolution = _resolver.Resolve(resolvedBlockers);
+            var resolvedTestcases = resolution.ResolvedTestcases;
 
-            var cost = _fitness.GetCostForResolvedBlockers(resolvedBlockers);
-            var value = _fitness.GetValueForResolvedTestcases(resolvedTestcases);
+            var cost = _dataset.GetCostForBlockers(resolvedBlockers);
+            var value = _dataset.GetValueForTestcases(resolvedTestcases);
 
             OnGenerationEvaluated(new GenerationEvaluatedEventArgs(
                 _generationCounter++,

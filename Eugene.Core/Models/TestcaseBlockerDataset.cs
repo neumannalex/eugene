@@ -71,6 +71,48 @@ namespace Eugene.Core.Models
             }
         }
 
+        public double BlockedValue
+        {
+            get
+            {
+                return GetValueForTestcases(BlockedTestcases);
+            }
+        }
+
+        public double UnblockedValue
+        {
+            get
+            {
+                return GetValueForTestcases(UnblockedTestcases);
+            }
+        }
+
+        public double TotalValue
+        {
+            get
+            {
+                return GetValueForTestcases(Testcases);
+            }
+        }
+
+        public double TotalCost
+        {
+            get
+            {
+                return GetCostForBlockers(Blockers);
+            }
+        }
+
+        public double GetCostForBlockers(IEnumerable<Blocker> blockers)
+        {
+            return blockers.Sum(x => x.Cost);
+        }
+
+        public double GetValueForTestcases(IEnumerable<Testcase> testcases)
+        {
+            return testcases.Sum(x => x.Weight);
+        }
+
         public override string ToString()
         {
             var sb = new StringBuilder();
