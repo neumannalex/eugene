@@ -380,7 +380,7 @@ namespace Eugene.Desktop.ViewModels
             });
             IsRunning = false;
 
-            SetStatusMessage($"{SelectedBlockers.Count} Blockers resolved.");
+            //SetStatusMessage($"{SelectedBlockers.Count} Blockers resolved.");
         }
         private bool CanResolveSelectedBlockers()
         {

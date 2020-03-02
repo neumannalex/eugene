@@ -145,6 +145,15 @@ namespace NUnitTestProject1
 
             Assert.IsTrue(expectedResolvedBlockerIds.Except(resolvedDataset.ResolvedBlockers.Select(x => x.Id)).Count() == 0);
             Assert.IsTrue(expectedUnresolvedBlockerIds.Except(resolvedDataset.UnresolvedBlockers.Select(x => x.Id)).Count() == 0);
+
+            var expectedResolvedTestcaseIds = new List<string> { "2", "4", "7" };
+            var expectedUnresolvedTestcaseIds = new List<string> { "1", "3", "5", "6", "8", "9" };
+
+            Assert.IsTrue(resolvedDataset.ResolvedDataset.UnblockedTestcases.Count == expectedResolvedTestcaseIds.Count);
+            Assert.IsTrue(resolvedDataset.ResolvedDataset.BlockedTestcases.Count == expectedUnresolvedTestcaseIds.Count);
+
+            Assert.IsTrue(expectedResolvedTestcaseIds.Except(resolvedDataset.ResolvedDataset.UnblockedTestcases.Select(x => x.Id)).Count() == 0);
+            Assert.IsTrue(expectedUnresolvedTestcaseIds.Except(resolvedDataset.ResolvedDataset.BlockedTestcases.Select(x => x.Id)).Count() == 0);
         }
 
         [Test]
