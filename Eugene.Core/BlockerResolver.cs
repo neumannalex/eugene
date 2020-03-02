@@ -10,36 +10,106 @@ namespace Eugene.Core
     public class BlockerResolver
     {
         private TestcaseBlockerDataset _initialDataset;
+        public TestcaseBlockerDataset InitialDataset
+        {
+            get
+            {
+                return _initialDataset;
+            }
+        }
 
         public BlockerResolver(TestcaseBlockerDataset initialDataset)
         {
             _initialDataset = initialDataset;
         }
 
-        public BlockerResolverResult Resolve(List<Blocker> blockers)
+        public BlockerResolverResult Resolve2(List<Blocker> blockers)
         {
-            var localDataset = (TestcaseBlockerDataset)CloneHelper.GetDeepClone(_initialDataset);
-
-            // Remove Blockers from Testcases
-            foreach (var testcase in localDataset.Testcases)
+            var remainingBlockers = new List<Blocker>();
+            foreach(var blocker in InitialDataset.Blockers)
             {
-                foreach (var blocker in blockers)
+                // Anzahl der durch diesen Blocker blockierten Testfälle
+                var numBlockedTestcases = InitialDataset.Testcases.Where(x => x.BlockerIds.Contains(blocker.Id)).Count();
+                
+                // Blocker kann beibehalten werden, wenn er Testfälle blockiert
+                if (numBlockedTestcases > 0)
                 {
-                    testcase.BlockerIds.Remove(blocker.Id);
+                    // zu lösende Blocker enthalten den aktuellen Blocker nicht --> aktueller Blocker wird beibehalten
+                    if (blockers.Where(x => x.Id == blocker.Id).Count() <= 0)
+                    {
+                        remainingBlockers.Add(blocker);
+                    }
                 }
             }
 
-            // Remove Blockers from Dataset
-            var blockersToRemove = new List<Blocker>();
-            foreach(var blocker in localDataset.Blockers)
+            var test = InitialDataset.Blockers.Except(blockers);
+
+            var resolvedTestcases = new List<Testcase>();
+            // Remove Blockers from Testcases
+            foreach (var testcase in InitialDataset.Testcases)
             {
-                var numBlockedTestcases = localDataset.Testcases.Where(x => x.BlockerIds.Contains(blocker.Id)).Count();
-                if (numBlockedTestcases <= 0)
-                    blockersToRemove.Add(blocker);
+                var blockerIds = new List<string>();
+                foreach(var remainingBlocker in remainingBlockers)
+                {
+                    if(testcase.BlockerIds.Contains(remainingBlocker.Id))
+                    {
+                        blockerIds.Add(remainingBlocker.Id);
+                    }
+                }
+
+                resolvedTestcases.Add(new Testcase
+                {
+                    Id = testcase.Id,
+                    Name = testcase.Name,
+                    Weight = testcase.Weight,
+                    BlockerIds = blockerIds
+                });
             }
 
-            foreach (var blocker in blockersToRemove)
-                localDataset.Blockers.Remove(blocker);
+            var localDataset = new TestcaseBlockerDataset
+            {
+                Blockers = remainingBlockers,
+                Testcases = resolvedTestcases
+            };
+
+            var result = new BlockerResolverResult(_initialDataset, localDataset);
+
+            return result;
+        }
+
+        public BlockerResolverResult Resolve(List<Blocker> blockers)
+        {
+            var blockerIdsToResolve = blockers.Select(x => x.Id);
+            //var remainingBlockers = InitialDataset.Blockers.Except(blockers);
+            var resolvedTestcases = new List<Testcase>();
+
+            // Remove Blockers from Testcases
+            foreach (var testcase in InitialDataset.Testcases)
+            {
+                var testcaseBlockerIds = new List<string>(testcase.BlockerIds.Where(x => !blockerIdsToResolve.Contains(x)));
+
+                resolvedTestcases.Add(new Testcase
+                {
+                    Id = testcase.Id,
+                    Name = testcase.Name,
+                    Weight = testcase.Weight,
+                    BlockerIds = testcaseBlockerIds
+                });
+            }
+
+            var unresolvedBlockerIds = resolvedTestcases.SelectMany(x => x.BlockerIds).Distinct();
+            var unresolvedBlockers = new List<Blocker>();
+            foreach(var blocker in InitialDataset.Blockers)
+            {
+                if (unresolvedBlockerIds.Contains(blocker.Id))
+                    unresolvedBlockers.Add(blocker);
+            }
+
+            var localDataset = new TestcaseBlockerDataset
+            {
+                Blockers = unresolvedBlockers,
+                Testcases = resolvedTestcases
+            };
 
             var result = new BlockerResolverResult(_initialDataset, localDataset);
 

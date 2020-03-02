@@ -65,7 +65,7 @@ namespace Eugene.Core
             _mutation = new TworsMutation();
 
             _chromosome = new BlockedTestcasesChromosome(_dataset.Blockers.Count);
-            _fitness = new WeightedMaximizeSolvedTestcasesFitness(_dataset);
+            _fitness = new WeightedMaximizeSolvedTestcasesFitness(_resolver);
 
             _population = new Population(20, 40, _chromosome);
 

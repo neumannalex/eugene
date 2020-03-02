@@ -11,7 +11,6 @@ namespace Eugene.Core.GA
 {
     public class WeightedMaximizeSolvedTestcasesFitness : IFitness
     {
-        private readonly TestcaseBlockerDataset _dataset;
         private BlockerResolver _resolver;
 
         public event EventHandler Evaluated;
@@ -24,10 +23,9 @@ namespace Eugene.Core.GA
             }
         }
 
-        public WeightedMaximizeSolvedTestcasesFitness(TestcaseBlockerDataset configuration)
+        public WeightedMaximizeSolvedTestcasesFitness(BlockerResolver resolver)
         {
-            _dataset = configuration;
-            _resolver = new BlockerResolver(_dataset);
+            _resolver = resolver;
         }
 
         public double Evaluate(IChromosome chromosome)
@@ -35,33 +33,33 @@ namespace Eugene.Core.GA
             var myChromosome = chromosome as BlockedTestcasesChromosome;
             var genes = myChromosome.GetGenes().Select(x => (bool)x.Value).ToList();
 
-            var blockersToResolve = GetBlockersToResolveFromChromosome(myChromosome);
+            var blockersToResolve = GetBlockersToResolveFromChromosome(myChromosome, _resolver.InitialDataset.Blockers.ToList());
 
             var resolution = _resolver.Resolve(blockersToResolve);
 
-            var cost = _dataset.GetCostForBlockers(resolution.ResolvedBlockers);
-            var value = _dataset.GetValueForTestcases(resolution.ResolvedTestcases);
-            value /= _dataset.TotalValue;
+            var cost = _resolver.InitialDataset.GetCostForBlockers(resolution.ResolvedBlockers);
+            var value = _resolver.InitialDataset.GetValueForTestcases(resolution.ResolvedTestcases);
+            value /= _resolver.InitialDataset.TotalValue;
 
             double fitness = value / cost;
 
             return fitness;
         }
 
-        private List<Blocker> GetBlockersToResolveFromChromosome(BlockedTestcasesChromosome chromosome)
+        private List<Blocker> GetBlockersToResolveFromChromosome(BlockedTestcasesChromosome chromosome, List<Blocker> blockers)
         {
-            var blockers = new List<Blocker>();
+            var selectedBlockers = new List<Blocker>();
 
             var genes = chromosome.GetGenes();
             for (int i = 0; i < genes.Length; i++)
             {
                 if ((bool)genes[i].Value == true)
                 {
-                    blockers.Add(_dataset.Blockers[i]);
+                    selectedBlockers.Add(blockers[i]);
                 }
             }
 
-            return blockers;
+            return selectedBlockers;
         }
     }
 }
