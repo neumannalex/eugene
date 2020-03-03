@@ -1,0 +1,47 @@
+﻿<Window x:Class="Eugene.Desktop.Dialogs.ExcelImportDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Eugene.Desktop.Dialogs"
+        mc:Ignorable="d"
+        Title="Excel Import Dialog" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen">
+    <Grid Margin="15">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0">Worksheet name:</Label>
+        <TextBox x:Name="txtWorksheetName" Grid.Row="0" Grid.Column="1" Width="200" HorizontalAlignment="Left" Margin="5,3" />
+
+        <Label Grid.Row="1" Grid.Column="0">Column number for Testcase Id:</Label>
+        <TextBox x:Name="txtColumnNumberTestcaseId" Grid.Row="1" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
+
+        <Label Grid.Row="2" Grid.Column="0">Column number for Testcase Name:</Label>
+        <TextBox x:Name="txtColumnNumberTestcaseName" Grid.Row="2" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
+
+        <Label Grid.Row="3" Grid.Column="0">Column number for Blocker Names:</Label>
+        <TextBox x:Name="txtColumnNumberBlockerNames" Grid.Row="3" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
+
+        <Label Grid.Row="4" Grid.Column="0">Blocker Separator:</Label>
+        <TextBox x:Name="txtBlockerSeparator" Grid.Row="4" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
+
+        <Label Grid.Row="5" Grid.Column="0">First data row:</Label>
+        <TextBox x:Name="txtFirstDataRow" Grid.Row="5" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
+
+        <WrapPanel Grid.Row="6" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,15,0,0">
+            <Button IsDefault="True" Name="btnDialogOk" Click="btnDialogOk_Click" MinWidth="60" Margin="0,0,10,0">_Ok</Button>
+            <Button IsCancel="True" MinWidth="60">_Cancel</Button>
+        </WrapPanel>
+    </Grid>
+</Window>

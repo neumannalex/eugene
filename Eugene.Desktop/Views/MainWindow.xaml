@@ -33,24 +33,24 @@
                 <MenuItem Header="Generate Random" Command="{Binding GenerateDatasetCommand}" />
                 <Separator />
                 <MenuItem Header="Resolved selected Blockers" Command="{Binding ResolveSelectedBlockersCommand}" />
+                <Separator />
+                <MenuItem Header="Export" Command="{Binding ExportResolvedDatasetCommand}" />
             </MenuItem>
             <MenuItem Header="Optimization">
                 <MenuItem Header="Start" Command="{Binding StartOptimizationCommand}" />
-            </MenuItem>
-            <MenuItem Header="Result">
-                <MenuItem Header="Save" Command="{Binding SaveResultCommand}" />
-                <MenuItem Header="Export" Command="{Binding ExportResultCommand}" />
+                <MenuItem Header="Save Result" Command="{Binding SaveOptimizationResultCommand}" />
             </MenuItem>
         </Menu>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="199*" />
+                <ColumnDefinition Width="66*"/>
                 <ColumnDefinition Width="3" />
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="531*" />
             </Grid.ColumnDefinitions>
 
-            <GroupBox Grid.Column="0" Header="Blockers">
+            <GroupBox Grid.Column="0" Header="Blockers" Grid.ColumnSpan="3" Margin="0,0,3,0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -62,16 +62,16 @@
                     <xctk:CheckListBox Grid.Row="0" x:Name="lstBlockers" MinHeight="100" ItemsSource="{Binding Dataset.Blockers}" DisplayMemberPath="Name" SelectedItemsOverride="{Binding SelectedBlockers}" Command="{Binding NotifyBlockersSelectedCommand}" IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBooleanConverter}}" />
 
                     <Button Grid.Row="1" Command="{Binding ResolveSelectedBlockersCommand}">Resolve selected Blockers</Button>
-                    
+
                     <GridSplitter Grid.Row="2" ResizeDirection="Rows" HorizontalAlignment="Stretch" />
 
                     <xctk:PropertyGrid Grid.Row="3" SelectedObject="{Binding ElementName=lstBlockers, Path=SelectedItem}" IsReadOnly="True" />
                 </Grid>
             </GroupBox>
 
-            <GridSplitter Grid.Column="1" ResizeDirection="Columns" HorizontalAlignment="Stretch" />
+            <GridSplitter Grid.Column="2" ResizeDirection="Columns" HorizontalAlignment="Stretch" Grid.ColumnSpan="2" Margin="0,0,531,0" />
 
-            <GroupBox Grid.Column="2" Header="Dataset">
+            <GroupBox Grid.Column="3" Header="Dataset">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
@@ -88,7 +88,7 @@
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Resolved Blockers:" />
                         <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Resolution.ResolvedBlockers.Count}" />
-                        
+
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Resolved Testcases:" />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Resolution.ResolvedTestcases.Count}" />
                     </Grid>
@@ -110,7 +110,7 @@
                     </TabControl>
                 </Grid>
             </GroupBox>
-            
+
         </Grid>
 
         <StatusBar Grid.Row="2">
@@ -139,6 +139,6 @@
                 <ProgressBar Minimum="0" Maximum="100" IsIndeterminate="{Binding IsRunning}" Height="16" HorizontalAlignment="Center" Width="190" ToolTip="Searching for best Blocker solution" />
             </StatusBarItem>
         </StatusBar>
-        
+
     </Grid>
 </Window>

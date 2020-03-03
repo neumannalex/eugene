@@ -24,6 +24,12 @@ namespace Eugene.Core.Models
         public override bool Equals(object obj) => Equals(obj as Blocker);
         public static bool operator ==(Blocker obj1, Blocker obj2)
         {
+            if (obj1 is null && obj2 is null)
+                return true;
+
+            if (obj1 is null && !(obj2 is null))
+                return false;
+
             return obj1.Equals(obj2);
         }
         public static bool operator !=(Blocker obj1, Blocker obj2)

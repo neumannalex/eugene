@@ -1,6 +1,7 @@
 ﻿using Eugene.Core;
 using Eugene.Core.Helper;
 using Eugene.Core.Models;
+using Eugene.Desktop.Dialogs;
 using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -129,9 +130,9 @@ namespace Eugene.Desktop.ViewModels
                                                 .ObservesProperty(() => IsRunning)
                                                 .ObservesProperty(() => OptimizationResult);
 
-            ExportResultCommand = new DelegateCommand(ExportResult, CanExportResult)
+            ExportResolvedDatasetCommand = new DelegateCommand(ExportResolvedDataset, CanExportResolvedDataset)
                                                 .ObservesProperty(() => IsRunning)
-                                                .ObservesProperty(() => OptimizationResult);
+                                                .ObservesProperty(() => ResolvedDataset);
 
             ResolveSelectedBlockersCommand = new DelegateCommand(ResolveSelectedBlockers, CanResolveSelectedBlockers)
                                                 .ObservesProperty(() => IsRunning)
@@ -210,7 +211,7 @@ namespace Eugene.Desktop.ViewModels
         }
 
         public DelegateCommand ImportDatasetCommand { get; private set; }
-        private async void ImportDataset()
+        private void ImportDataset()
         {
             var options = new ExcelImportOptions
             {
@@ -224,20 +225,33 @@ namespace Eugene.Desktop.ViewModels
 
             var dlg = new OpenFileDialog
             {
-                Filter = "Json (*.json)|*.json"
+                Filter = "Excel (*.xlsx)|*.xlsx"
             };
 
             if (dlg.ShowDialog() == true)
             {
-                try
+
+                var optionsDlg = new ExcelImportDialog();
+                if(optionsDlg.ShowDialog() == true)
                 {
-                    Dataset = DataGenerator.ImportFromExcel(dlg.FileName, options);
-                    SetStatusMessage("Dataset imported.");
-                }
-                catch
-                {
-                    Dataset = null;
-                    SetStatusMessage("Importing dataset failed. Please check the data format and options.");
+                    options = optionsDlg.ImportOptions;
+                    if(options != null)
+                    {
+                        try
+                        {
+                            Dataset = DataGenerator.ImportFromExcel(dlg.FileName, options);
+                            SetStatusMessage("Dataset imported.");
+                        }
+                        catch
+                        {
+                            Dataset = null;
+                            SetStatusMessage("Importing dataset failed. Please check the data format and options.");
+                        }
+                    }
+                    else
+                    {
+                        SetStatusMessage("Invalid import options given.");
+                    }
                 }
             }
         }
@@ -276,7 +290,7 @@ namespace Eugene.Desktop.ViewModels
         }
 
         public DelegateCommand GenerateDatasetCommand { get; private set; }
-        private async void GenerateDataset()
+        private void GenerateDataset()
         {
             Dataset = DataGenerator.GenerateRandomData(20, 50);
         }
@@ -314,22 +328,31 @@ namespace Eugene.Desktop.ViewModels
             return true;
         }
 
-        public DelegateCommand ExportResultCommand { get; private set; }
-        private async void ExportResult()
+        public DelegateCommand ExportResolvedDatasetCommand { get; private set; }
+        private async void ExportResolvedDataset()
         {
-            MessageBox.Show("Not yet implemented");
+            var dlg = new SaveFileDialog
+            {
+                DefaultExt = "xlsx",
+                Filter = "Excel (*.xlsx)|*.xlsx"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                await ResolvedDataset.ExportAsXlsxAsync(dlg.FileName);
+                SetStatusMessage("Dataset saved.");
+            }
         }
-        private bool CanExportResult()
+        private bool CanExportResolvedDataset()
         {
             if (IsRunning)
                 return false;
 
-            if (OptimizationResult == null)
+            if (ResolvedDataset == null)
                 return false;
 
             return true;
         }
-
 
         public DelegateCommand StartOptimizationCommand { get; private set; }
         private async void StartOptimization()

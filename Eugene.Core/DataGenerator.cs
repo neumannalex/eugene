@@ -2,6 +2,7 @@
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -139,8 +140,9 @@ namespace Eugene.Core
 
                 return dataset;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Debug.WriteLine(ex.Message);
                 throw; 
             }
         }
