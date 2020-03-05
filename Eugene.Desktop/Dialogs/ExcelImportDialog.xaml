@@ -19,6 +19,8 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0">Worksheet name:</Label>
@@ -30,16 +32,22 @@
         <Label Grid.Row="2" Grid.Column="0">Column number for Testcase Name:</Label>
         <TextBox x:Name="txtColumnNumberTestcaseName" Grid.Row="2" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
 
-        <Label Grid.Row="3" Grid.Column="0">Column number for Blocker Names:</Label>
-        <TextBox x:Name="txtColumnNumberBlockerNames" Grid.Row="3" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
+        <Label Grid.Row="3" Grid.Column="0">Column number for Test Type:</Label>
+        <TextBox x:Name="txtColumnNumberTestType" Grid.Row="3" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
 
-        <Label Grid.Row="4" Grid.Column="0">Blocker Separator:</Label>
-        <TextBox x:Name="txtBlockerSeparator" Grid.Row="4" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
+        <Label Grid.Row="4" Grid.Column="0">Column number for Testcase Name:</Label>
+        <TextBox x:Name="txtColumnNumberApplicationModule" Grid.Row="4" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
 
-        <Label Grid.Row="5" Grid.Column="0">First data row:</Label>
-        <TextBox x:Name="txtFirstDataRow" Grid.Row="5" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
+        <Label Grid.Row="5" Grid.Column="0">Column number for Blocker Names:</Label>
+        <TextBox x:Name="txtColumnNumberBlockerNames" Grid.Row="5" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
 
-        <WrapPanel Grid.Row="6" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,15,0,0">
+        <Label Grid.Row="6" Grid.Column="0">Blocker Separator:</Label>
+        <TextBox x:Name="txtBlockerSeparator" Grid.Row="6" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
+
+        <Label Grid.Row="7" Grid.Column="0">First data row:</Label>
+        <TextBox x:Name="txtFirstDataRow" Grid.Row="7" Grid.Column="1" Width="50" HorizontalAlignment="Left" Margin="5,3" />
+
+        <WrapPanel Grid.Row="8" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,15,0,0">
             <Button IsDefault="True" Name="btnDialogOk" Click="btnDialogOk_Click" MinWidth="60" Margin="0,0,10,0">_Ok</Button>
             <Button IsCancel="True" MinWidth="60">_Cancel</Button>
         </WrapPanel>

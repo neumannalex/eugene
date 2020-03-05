@@ -15,5 +15,8 @@ namespace Eugene.Core.Models
 
         public int FirstDataRow { get; set; } = 1;
         public int? LastDataRow { get; set; } = null;
+
+        public int? ColumnNumberTestType { get; set; }
+        public int? ColumnNumberApplicationModule { get; set; }
     }
 }

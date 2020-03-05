@@ -7,7 +7,9 @@ namespace Eugene.Core.Models
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public double Weight { get; set; } = 1;
+        public string TestType { get; set; }
+        public string ApplicationModule { get; set; }
+        //public double Weight { get; set; } = 1;
         public IList<string> BlockerIds { get; set; } = new List<string>();
 
         public override string ToString()

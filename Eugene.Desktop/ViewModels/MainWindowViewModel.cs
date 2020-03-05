@@ -19,6 +19,33 @@ namespace Eugene.Desktop.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
+        private BusinessValueMap _businessValue = new BusinessValueMap();
+        public BusinessValueMap BusinessValue
+        {
+            get { return _businessValue; }
+            set
+            {
+                SetProperty(ref _businessValue, value);
+
+                //if (Dataset != null)
+                //{
+                //    Dataset.BusinessValue = _businessValue;
+                //    DatasetAsTable = ConvertDatasetToTable(Dataset);
+                //}
+
+                //if (ResolvedDataset != null)
+                //{
+                //    ResolvedDataset.BusinessValue = _businessValue;
+                //    ResolvedDatasetAsTable = ConvertDatasetToTable(ResolvedDataset);
+                //}
+
+                //RaisePropertyChanged(nameof(Dataset));
+                //RaisePropertyChanged(nameof(DatasetAsTable));
+                //RaisePropertyChanged(nameof(ResolvedDataset));
+                //RaisePropertyChanged(nameof(ResolvedDatasetAsTable));
+            }
+        }
+
         private TestcaseBlockerDataset _dataset = null;
         public TestcaseBlockerDataset Dataset
         {
@@ -26,6 +53,7 @@ namespace Eugene.Desktop.ViewModels
             set
             {
                 SetProperty(ref _dataset, value);
+                _dataset.BusinessValue = BusinessValue ?? new BusinessValueMap();
 
                 DatasetAsTable = ConvertDatasetToTable(_dataset);
 
@@ -40,6 +68,7 @@ namespace Eugene.Desktop.ViewModels
             set
             {
                 SetProperty(ref _resolvedDataset, value);
+                _resolvedDataset.BusinessValue = BusinessValue ?? new BusinessValueMap();
 
                 ResolvedDatasetAsTable = ConvertDatasetToTable(_resolvedDataset);
             }
@@ -73,15 +102,15 @@ namespace Eugene.Desktop.ViewModels
             set { SetProperty(ref _statusMessage, value); }
         }
 
-        private DataTable _datasetAsTable;
-        public DataTable DatasetAsTable
+        private DataView _datasetAsTable;
+        public DataView DatasetAsTable
         {
             get { return _datasetAsTable; }
             set { SetProperty(ref _datasetAsTable, value); }
         }
 
-        private DataTable _resolvedDatasetAsTable;
-        public DataTable ResolvedDatasetAsTable
+        private DataView _resolvedDatasetAsTable;
+        public DataView ResolvedDatasetAsTable
         {
             get { return _resolvedDatasetAsTable; }
             set { SetProperty(ref _resolvedDatasetAsTable, value); }
@@ -103,6 +132,10 @@ namespace Eugene.Desktop.ViewModels
 
         public MainWindowViewModel()
         {
+            BusinessValue.TestTypes.Add("Regression", 0.5);
+            BusinessValue.TestTypes.Add("Level 2", 2);
+
+            #region Initialize Commands
             ExitApplicationCommand = new DelegateCommand(ExitApplication, CanExitApplication);
 
             LoadDatasetCommand = new DelegateCommand(LoadDataset, CanLoadDataset)
@@ -141,6 +174,8 @@ namespace Eugene.Desktop.ViewModels
 
             NotifyBlockersSelectedCommand = new DelegateCommand(NotifyBlockersSelected, CanNotifyBlockersSelected);
 
+            ApplyBusinessValueCommand = new DelegateCommand(ApplyBusinessValue, CanApplyBusinessValue);
+            #endregion
         }
 
         #region Commands
@@ -428,6 +463,28 @@ namespace Eugene.Desktop.ViewModels
         {
             return true;
         }
+
+        public DelegateCommand ApplyBusinessValueCommand { get; private set; }
+        private void ApplyBusinessValue()
+        {
+            if (Dataset != null)
+            {
+                Dataset.BusinessValue = BusinessValue;
+                DatasetAsTable = ConvertDatasetToTable(Dataset);
+                RaisePropertyChanged(nameof(Dataset));
+            }
+
+            if (ResolvedDataset != null)
+            {
+                ResolvedDataset.BusinessValue = BusinessValue;
+                ResolvedDatasetAsTable = ConvertDatasetToTable(ResolvedDataset);
+                RaisePropertyChanged(nameof(ResolvedDataset));
+            }
+        }
+        private bool CanApplyBusinessValue()
+        {
+            return true;
+        }
         #endregion
 
         private void SetStatusMessage(string message)
@@ -439,7 +496,7 @@ namespace Eugene.Desktop.ViewModels
         {
             //lblStatusDataset.Text = Dataset != null ? "Dataset: ok" : "No Dataset";
         }
-        private DataTable ConvertDatasetToTable(TestcaseBlockerDataset dataset)
+        private DataView ConvertDatasetToTable(TestcaseBlockerDataset dataset)
         {
             if (dataset == null)
                 return null;
@@ -450,6 +507,9 @@ namespace Eugene.Desktop.ViewModels
             table.Columns.Add(new DataColumn("#", typeof(int)));
             table.Columns.Add(new DataColumn("Testcase Id", typeof(string)));
             table.Columns.Add(new DataColumn("Testcase Name", typeof(string)));
+            table.Columns.Add(new DataColumn("Test Type", typeof(string)));
+            table.Columns.Add(new DataColumn("App. Module", typeof(string)));
+            table.Columns.Add(new DataColumn("Value", typeof(string)));
 
 
             Dictionary<string, int> sumOfBlockedTestcases = new Dictionary<string, int>();
@@ -469,18 +529,21 @@ namespace Eugene.Desktop.ViewModels
                 newRow[0] = testcaseIndex + 1;
                 newRow[1] = testcase.Id;
                 newRow[2] = testcase.Name;
+                newRow[3] = testcase.TestType;
+                newRow[4] = testcase.ApplicationModule;
+                newRow[5] = dataset.GetValueForTestcases(new List<Testcase> { testcase });
 
-                for(int i = 0; i < dataset.Blockers.Count; i++)
+                for (int i = 0; i < dataset.Blockers.Count; i++)
                 {
                     var blockerId = dataset.Blockers[i].Id;
                     if(testcase.BlockerIds.Contains(blockerId))
                     {
-                        newRow[i + 3] = "x";
+                        newRow[i + 6] = "x";
                         sumOfBlockedTestcases[blockerId]++;
                     }
                 }
 
-                newRow[dataset.Blockers.Count + 3] = testcase.BlockerIds.Count;
+                newRow[dataset.Blockers.Count + 6] = testcase.BlockerIds.Count;
 
                 table.Rows.Add(newRow);
             }
@@ -491,12 +554,12 @@ namespace Eugene.Desktop.ViewModels
             {
                 var blockerId = dataset.Blockers[i].Id;
                 var blocked = sumOfBlockedTestcases[blockerId];
-                resultRow[i + 3] = blocked;
+                resultRow[i + 6] = blocked;
             }
             table.Rows.Add(resultRow);
 
 
-            return table;
+            return table.DefaultView;
         }
     }
 }

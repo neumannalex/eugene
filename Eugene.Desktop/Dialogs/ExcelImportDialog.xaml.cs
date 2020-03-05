@@ -30,6 +30,8 @@ namespace Eugene.Desktop.Dialogs
                         FirstDataRow = Convert.ToInt32(txtFirstDataRow.Text),
                         ColumnNumberTestcaseId = Convert.ToInt32(txtColumnNumberTestcaseId.Text),
                         ColumnNumberTestcaseName = Convert.ToInt32(txtColumnNumberTestcaseName.Text),
+                        ColumnNumberTestType = Convert.ToInt32(txtColumnNumberTestType.Text),
+                        ColumnNumberApplicationModule = Convert.ToInt32(txtColumnNumberApplicationModule.Text),
                         ColumnNumberBlockerNames = Convert.ToInt32(txtColumnNumberBlockerNames.Text),
                         BlockerSeparator = txtBlockerSeparator.Text
                     };
@@ -52,6 +54,8 @@ namespace Eugene.Desktop.Dialogs
             txtFirstDataRow.Text = "2";
             txtColumnNumberTestcaseId.Text = "2";
             txtColumnNumberTestcaseName.Text = "4";
+            txtColumnNumberTestType.Text = "12";
+            txtColumnNumberApplicationModule.Text = "15";
             txtColumnNumberBlockerNames.Text = "1";
             txtBlockerSeparator.Text = ",";
         }

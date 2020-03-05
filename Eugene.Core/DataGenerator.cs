@@ -97,10 +97,15 @@ namespace Eugene.Core
                         var blockerNamesString = (Convert.ToString(ws.Cells[row, options.ColumnNumberBlockerNames].Value)).Trim();
                         var blockerNames = new List<string>(blockerNamesString.Split(options.BlockerSeparator.ToCharArray()));
 
+                        var testtype = options.ColumnNumberTestType.HasValue ? (Convert.ToString(ws.Cells[row, options.ColumnNumberTestType.Value].Value)).Trim() : string.Empty;
+                        var applicationModule = options.ColumnNumberApplicationModule.HasValue ? (Convert.ToString(ws.Cells[row, options.ColumnNumberApplicationModule.Value].Value)).Trim(): string.Empty;
+
                         var testcase = new Testcase
                         {
                             Id = testcaseId,
-                            Name = testcaseName
+                            Name = testcaseName,
+                            TestType = testtype,
+                            ApplicationModule = applicationModule
                         };
 
                         foreach (var blockerName in blockerNames)

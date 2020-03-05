@@ -5,11 +5,9 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eugene.Core", "Eugene.Core\Eugene.Core.csproj", "{0DD016AF-E929-412A-81EC-F1D997874355}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eugene", "Eugene.Console\Eugene.csproj", "{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eugene.Desktop", "Eugene.Desktop\Eugene.Desktop.csproj", "{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTestProject1", "NUnitTestProject1\NUnitTestProject1.csproj", "{E7B1B881-3362-46E1-96BC-3A8A2E753DFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnitTestProject1", "NUnitTestProject1\NUnitTestProject1.csproj", "{E7B1B881-3362-46E1-96BC-3A8A2E753DFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +19,6 @@ Global
 		{0DD016AF-E929-412A-81EC-F1D997874355}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DD016AF-E929-412A-81EC-F1D997874355}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DD016AF-E929-412A-81EC-F1D997874355}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D03375A1-C066-46EF-BC9E-3B8E0DB4284F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{793BA6DB-6419-47A3-A6DE-B5D58D46E3BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
